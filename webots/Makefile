@@ -6,6 +6,10 @@ cpptakeoff:
 	webots worlds/standard.wbt &
 	webots-controller controllers/cpptakeoff/cpptakeoff
 
+haskell:
+	webots worlds/standard.wbt &
+	webots-controller controllers/haskell/haskell
+
 python:
 	webots worlds/standard.wbt &
 	webots-controller controllers/python/python.py
