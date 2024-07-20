@@ -1,5 +1,5 @@
-<img src="media/tinyape.jpg" width=420 align="left">
-<img src="media/webots2.png" width=400>
+<img src="media/tinyape.jpg" height=300 align="left">
+<img src="media/webots2.png" height=300>
 
 # TinyFlight
 Minimalist flight-control firmware with simulator
