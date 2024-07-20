@@ -1,3 +1,5 @@
+<img src="media/tinyape.jpg" width=600>
+
 # TinyFlight
 Minimalist flight-control firmware with simulator
 
