@@ -1,4 +1,4 @@
-<img src="media/tinyape.jpg" width=400 align="left">
+<img src="media/tinyape.jpg" width=420 align="left">
 <img src="media/webots2.png" width=400>
 
 # TinyFlight
