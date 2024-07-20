@@ -9,8 +9,8 @@ Minimalist flight-control firmware with simulator
 Install [Webots](https://cyberbotics.com/)
 
 ```
-cd webots/controllers/simple
-make
+cd webots
+make python
 ```
 
 Launch webots; Open World webots/worlds/simple.wbt
