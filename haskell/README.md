@@ -1,1 +1,1 @@
-<img src="../media/haskell.png>
+<img src="haskell.png>
