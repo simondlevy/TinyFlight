@@ -1,6 +1,5 @@
 #include <tasks/core.hpp>
-
-#include <sim/quadcopter.hpp>
+#include <webots.hpp>
 
 static const float PITCH_ROLL_ANGLE_KP = 6e0;
 
