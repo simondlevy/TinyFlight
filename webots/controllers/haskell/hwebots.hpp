@@ -30,11 +30,11 @@
 #include <webots/keyboard.h>
 #include <webots/robot.h>
 
-class Sticks {
+class Quadcopter {
 
     public:
 
-        void init(void)
+        void initSticks(void)
         {
             const auto timestep = wb_robot_get_basic_time_step();
 
@@ -42,7 +42,8 @@ class Sticks {
             wb_keyboard_enable(timestep);
         }
 
-        void read(float & throttle, float & roll, float & pitch, float & yaw)
+        void readSticks(
+                float & throttle, float & roll, float & pitch, float & yaw)
         {
             auto joystickStatus = haveJoystick();
 

@@ -24,7 +24,7 @@
 #include <webots/robot.h>
 
 #include <datatypes.h>
-#include <sticks.hpp>
+#include <hwebots.hpp>
 
 // ----------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 // ---------------------------------------------------------------------------
 
-static Sticks _sticks;
+static Quadcopter quadcopter;
 
 static WbDeviceTag _makeMotor(const char * name, const float direction)
 {
@@ -173,7 +173,7 @@ int main(int argc, char ** argv)
     auto gps = _makeSensor("gps", timestep, wb_gps_enable);
     auto camera = _makeSensor("camera", timestep, wb_camera_enable);
 
-    _sticks.init();
+    quadcopter.initSticks();
 
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
 
@@ -187,7 +187,7 @@ int main(int argc, char ** argv)
 
         // Get open-loop demands from input device (keyboard, joystick, etc.)
         float throttle = 0;
-        _sticks.read(
+        quadcopter.readSticks(
                 throttle,
                 stream_openLoopDemands.roll, 
                 stream_openLoopDemands.pitch, 
