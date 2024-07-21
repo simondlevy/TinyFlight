@@ -26,8 +26,7 @@
 #include <time.h>
 
 #include <datatypes.h>
-
-#include "sticks.hpp"
+#include <sim/sticks.hpp>
 
 // ----------------------------------------------------------------------------
 
@@ -190,7 +189,7 @@ int main(int argc, char ** argv)
 
     auto sec_start = _timesec();
 
-    stream_inFlyingMode = false;
+    stream_inFlyingMode = true;
     stream_resetPids = false;
 
     while (wb_robot_step(timestep) != -1) {
@@ -204,8 +203,7 @@ int main(int argc, char ** argv)
                 throttle,
                 stream_openLoopDemands.roll, 
                 stream_openLoopDemands.pitch, 
-                stream_openLoopDemands.yaw,
-                stream_inFlyingMode);
+                stream_openLoopDemands.yaw);
 
         stream_openLoopDemands.thrust = throttle;
 
