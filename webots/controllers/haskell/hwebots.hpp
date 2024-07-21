@@ -34,11 +34,25 @@ class Quadcopter {
 
     public:
 
+        WbDeviceTag gps;
+        WbDeviceTag gyro;
+        WbDeviceTag imu;
+
+
         void init(void)
         {
             wb_robot_init();
 
             const auto timestep = wb_robot_get_basic_time_step();
+
+            imu = Quadcopter::makeSensor("inertial_unit", 
+                    timestep, wb_inertial_unit_enable); 
+            gyro = Quadcopter::makeSensor("gyro", 
+                    timestep, wb_gyro_enable);
+            gps = Quadcopter::makeSensor("gps", 
+                    timestep, wb_gps_enable);
+            _camera = Quadcopter::makeSensor("camera", 
+                    timestep, wb_camera_enable);
 
             wb_joystick_enable(timestep);
             wb_keyboard_enable(timestep);
@@ -116,7 +130,7 @@ class Quadcopter {
         WbDeviceTag _m3_motor;
         WbDeviceTag _m4_motor;
 
-
+        WbDeviceTag _camera;
         // Handles bogus nonzero throttle stick values at startup
         bool ready;
 

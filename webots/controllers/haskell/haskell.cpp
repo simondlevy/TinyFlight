@@ -132,13 +132,6 @@ int main(int argc, char ** argv)
 
     const int timestep = (int)wb_robot_get_basic_time_step();
 
-    // Initialize sensors
-    auto imu = Quadcopter::makeSensor("inertial_unit", timestep,
-            wb_inertial_unit_enable); 
-    auto gyro = Quadcopter::makeSensor("gyro", timestep, wb_gyro_enable);
-    auto gps = Quadcopter::makeSensor("gps", timestep, wb_gps_enable);
-    auto camera = Quadcopter::makeSensor("camera", timestep, wb_camera_enable);
-
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
 
     stream_inFlyingMode = true;
@@ -163,7 +156,7 @@ int main(int argc, char ** argv)
         stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
 
         // Get vehicle state from sensors
-        _getVehicleState(gyro, imu, gps, stream_vehicleState);
+        _getVehicleState(_sim.gyro, _sim.imu, _sim.gps, stream_vehicleState);
 
         // Integrate stick demand to get altitude target
         altitudeTarget = _constrain(
