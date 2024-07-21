@@ -56,7 +56,7 @@ typedef struct {
 
     float z_dz;    // combination of Z and DZ for Python client
 
-} vehicleState_t;
+} state_t;
 
 typedef union {
     struct {
