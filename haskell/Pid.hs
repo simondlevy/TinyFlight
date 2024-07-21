@@ -1,5 +1,5 @@
 {--
-  Closed-loop / PID control support for real and simulated flight controllers
+  PID control support for real and simulated flight controllers
  
   Copyright (C) 2024 Simon D. Levy
  
@@ -16,7 +16,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 --} 
 
-module ClosedLoop where
+module Pid where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -25,7 +25,7 @@ import Demands
 import State
 import Utils
 
-type ClosedLoopController = SBool -> SFloat -> State -> Demands -> Demands
+type PidController = SBool -> SFloat -> State -> Demands -> Demands
 
 piController kp ki dt ilimit target actual integ' = (output, integ) where
 
