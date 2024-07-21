@@ -1,6 +1,5 @@
 {--
-  Pitch/roll angle PID-control algorithm for real and simulated flight
-  controllers
+  X/Y position PID control algorithm for real and simulated flight controllers
  
   Copyright (C) 2024 Simon D. Levy
  
@@ -20,50 +19,53 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module PitchRollAngle where
+module Position where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
-import ClosedLoop
+import Pid
 import Demands
 import State
 import Utils
 
-run reset kp ki ilimit dt target actual integ = (demand, integ') where
+run kp ki reset dt ilimit target actual integ = (demand, integ') where
 
-    error = target - actual
+  error = target - actual
 
-    demand = kp * error + ki * integ
+  demand = (-(kp * error + ki * integ))
 
-    integ' = if reset then 0 else constrain (integ + error * dt) (-ilimit) ilimit
+  integ' = if reset 
+           then 0
+           else constrain (integ + error * dt) (-ilimit) (ilimit)
 
 {--
+  Position controller converts meters per second to  degrees.
 
-  Demand is input as angles in degrees and output as angular velocities in
-  degrees per second:
+  Demands are input as normalized interval [-1,+1] and output as angles in 
+  degrees:
 
-  roll: right-down positive
+   roll:  input left positive => output negative
 
-  pitch: nose-up positive
-
+   pitch: input forward positive => output negative
 --}
 
-pitchRollAnglePid reset dt state demands = demands' where
+positionPid :: PidController
 
-  kp = 6
-  ki = 3
-  ilimit = 20
+positionPid reset dt state demands = demands'  where
 
+  kp = 25
+  ki = 1
+  ilimit = 5000
+    
   (rollDemand, rollInteg) = 
-    run reset kp ki ilimit dt (roll demands) (phi state) rollInteg'
-
-  (pitchDemand, pitchInteg) = 
-    run reset kp ki ilimit dt (pitch demands) (theta state) pitchInteg'
+    run kp ki reset dt ilimit (roll demands) (dy state) rollInteg'
 
   rollInteg' = [0] ++ rollInteg
+
+  (pitchDemand, pitchInteg) = 
+    run kp ki reset dt ilimit (pitch demands) (dx state) pitchInteg'
 
   pitchInteg' = [0] ++ pitchInteg
 
   demands' = Demands (thrust demands) rollDemand pitchDemand (yaw demands)
-

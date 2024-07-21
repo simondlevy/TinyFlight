@@ -1,5 +1,5 @@
 {--
-  Climb-rate algorithm for real and simulated flight controllers
+  Yaw rate PID control algorithm for real and simulated flight controllers
  
   Copyright (C) 2024 Simon D. Levy
  
@@ -19,38 +19,33 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module ClimbRate where
+module YawRate where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
-import ClosedLoop
+import Pid
 import Demands
 import State
 import Utils
 
-run dt thrust dz = thrust'  where
+-- Yaw demand is nose-right positive, whereas yaw angle psi and its first
+-- derivative (angular velocity) dspi are nose-right negative.
+-- Hence we negate yaw demand, run the PID closedloop on the
+-- negated demand and the angular velocity, and negate the result to get the
+-- correct yaw demand.
 
-    kp = 25
-    ki = 15
-    ilimit = 5000
+yawRatePid dt state demands = demands' where
 
-    (thrust', integ) = piController kp ki dt ilimit thrust dz integ'
+    kp = 120
+    ki = 16.7
+    ilimit = 166.7
+
+    (yaw', integ) = piController kp ki dt ilimit (-(yaw demands)) (dpsi state) integ'
+
+    -- No yaw demand on zero thrust
+    yaw'' = if (thrust demands) == 0 then 0 else yaw'
+
+    demands' = Demands (thrust demands) (roll demands) (pitch demands) (-yaw'')
 
     integ' = [0] ++ integ
-
-
-{-- 
-
-  Demand is input as climb rate in meters per second and output as arbitrary
-  positive value to be scaled according to motor characteristics.
-
---}
-
-climbRatePid flying dt state demands = demands' where
-
-    thrustraw = thrust demands
-
-    thrustout = if flying then run dt thrustraw (dz state) else thrustraw
-
-    demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)
