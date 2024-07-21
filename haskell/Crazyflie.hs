@@ -47,7 +47,7 @@ import YawRate
 -- Streams from C++ ----------------------------------------------------------
 
 demandsStruct :: Stream DemandsStruct
-demandsStruct = extern "stream_openLoopDemands" Nothing
+demandsStruct = extern "stream_stickDemands" Nothing
 
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
@@ -58,11 +58,11 @@ inFlyingMode = extern "stream_inFlyingMode" Nothing
 resetPids :: SBool
 resetPids = extern "stream_resetPids" Nothing
 
-step = (motors, openLoopDemands) where
+step = (motors, stickDemands) where
 
   vehicleState = liftState stateStruct
 
-  openLoopDemands = liftDemands demandsStruct
+  stickDemands = liftDemands demandsStruct
 
   dt = rateToPeriod clock_rate
 
@@ -74,7 +74,7 @@ step = (motors, openLoopDemands) where
           yawAnglePid dt,
           yawRatePid dt]
 
-  demands' = foldl (\demand pid -> pid vehicleState demand) openLoopDemands pids
+  demands' = foldl (\demand pid -> pid vehicleState demand) stickDemands pids
 
   thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) else tmin
 

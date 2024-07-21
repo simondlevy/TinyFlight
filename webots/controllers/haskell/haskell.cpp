@@ -16,9 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sim/quadcopter.hpp>
+
+static Quadcopter _quadcopter;
+
 // These are global so they can be shared with Haskell Copilot ---------------
 
-demands_t stream_openLoopDemands;
+demands_t stream_stickDemands;
 
 state_t stream_vehicleState;
 
@@ -35,56 +39,20 @@ void copilot_step_core(void);
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    // Set simulated motor values
-    wb_motor_set_velocity(_m1_motor, +m1);
-    wb_motor_set_velocity(_m2_motor, -m2);
-    wb_motor_set_velocity(_m3_motor, +m3);
-    wb_motor_set_velocity(_m4_motor, -m4);
+    _quadcopter.setMotors(m1, m2, m3, m4);
 }
+
+// ---------------------------------------------------------------------------
 
 int main(int argc, char ** argv)
 {
-    stream_inFlyingMode = false;
+    stream_inFlyingMode = true;
 
     stream_resetPids = false;
 
-    while (wb_robot_step(timestep) != -1) {
+    while (_quadcopter.step(stream_vehicleState, stream_stickDemands)) {
 
-        //Un-comment if you want to try OpenCV
-        // runCamera(camera);
-
-        // Get open-loop demands from input device (keyboard, joystick, etc.)
-        float throttle = 0;
-        _sticks.read(
-                throttle,
-                stream_openLoopDemands.roll, 
-                stream_openLoopDemands.pitch, 
-                stream_openLoopDemands.yaw,
-                stream_inFlyingMode);
-
-        stream_openLoopDemands.thrust = throttle;
-
-        // Adjust roll for positive leftward
-        stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
-
-        // Get vehicle state from sensors
-        _getVehicleState(gyro, imu, gps);
-
-        // Integrate stick demand to get altitude target
-        altitudeTarget = _constrain(
-                altitudeTarget + stream_openLoopDemands.thrust * DT, 
-                ALTITUDE_TARGET_MIN, ALTITUDE_TARGET_MAX);
-
-        // Rescale altitude target to [-1,+1]
-        stream_openLoopDemands.thrust = 2 * ((altitudeTarget - ALTITUDE_TARGET_MIN) /
-                (ALTITUDE_TARGET_MAX - ALTITUDE_TARGET_MIN)) - 1;
-
-       copilot_step_core();
-
-        //report(sec_start);
     }
-
-    wb_robot_cleanup();
 
     return 0;
 }
