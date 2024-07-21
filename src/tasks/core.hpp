@@ -4,13 +4,13 @@
 #include <mixers.hpp>
 #include <utils.hpp>
 
-#include <closed_loop/altitude.hpp>
-#include <closed_loop/climb_rate.hpp>
-#include <closed_loop/pitch_roll_angle.hpp>
-#include <closed_loop/pitch_roll_rate.hpp>
-#include <closed_loop/position.hpp>
-#include <closed_loop/yaw_angle.hpp>
-#include <closed_loop/yaw_rate.hpp>
+#include <pids/altitude.hpp>
+#include <pids/climb_rate.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
+#include <pids/position.hpp>
+#include <pids/yaw_angle.hpp>
+#include <pids/yaw_rate.hpp>
 
 class CoreTask {
 

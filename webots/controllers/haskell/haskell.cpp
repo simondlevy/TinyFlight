@@ -42,8 +42,6 @@ void setMotors(float m1, float m2, float m3, float m4)
     _quadcopter.setMotors(m1, m2, m3, m4);
 }
 
-// ---------------------------------------------------------------------------
-
 int main(int argc, char ** argv)
 {
     stream_inFlyingMode = true;
@@ -52,11 +50,10 @@ int main(int argc, char ** argv)
 
     while (_quadcopter.step(stream_vehicleState, stream_stickDemands)) {
 
+        // This function will read the vehicle state and stick-demand stream 
+        // and call setMotors() above
+        //copilot_step_core();
     }
 
     return 0;
-}
-
-void debugDemands(const float roll, const float pitch)
-{
 }
