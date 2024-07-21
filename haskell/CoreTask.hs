@@ -46,6 +46,10 @@ import YawRate
 
 -- Streams from C++ ----------------------------------------------------------
 
+status_landed     = 0 :: Int8
+status_taking_off = 1 :: Int8
+status_flying     = 2 :: Int8
+
 demandsStruct :: Stream DemandsStruct
 demandsStruct = extern "stream_stickDemands" Nothing
 
@@ -60,14 +64,15 @@ step = (motors, stickDemands) where
 
   dt = rateToPeriod clock_rate
 
-  resetPids = false
+  status = status'
 
-  inFlyingMode = false
+  status' = [status_landed] ++ status
 
+  {--
   pids = [positionPid resetPids dt,
           pitchRollAnglePid resetPids dt,
           pitchRollRatePid resetPids dt,
-          altitudePid inFlyingMode dt,
+          -- altitudePid dt,
           climbRatePid inFlyingMode dt,
           yawAnglePid dt,
           yawRatePid dt]
@@ -75,6 +80,11 @@ step = (motors, stickDemands) where
   demands' = foldl (\demand pid -> pid vehicleState demand) stickDemands pids
 
   thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) else tmin
+  --}
+
+  demands' = stickDemands
+
+  thrust'' = thrust stickDemands
 
   motors = quadXMixer $ Demands thrust''
                                 ((roll demands') * prscale)

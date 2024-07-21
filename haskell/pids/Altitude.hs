@@ -35,27 +35,19 @@ import Utils
 
 --}
 
-altitudePid flying dt state demands = demands'  where
+altitudePid state dt target demands = demands'  where
 
   kp = 2.0
   ki = 0.5
   ilimit = 5000
 
-  thrustraw = thrust demands
-
-  -- In flying mode, thrust demand comes in as [-1,+1], so we convert it to a 
-  -- target altitude in meters
-  target = rescale thrustraw (-1) 1 0.2 2.0
-
   error = target - (zz state)
 
   -- Reset integral when not in flying mode (flying)
-  integ = if flying 
-          then constrain (integ' + error * dt) (-ilimit) ilimit
-          else 0
+  integ = constrain (integ' + error * dt) (-ilimit) ilimit
 
   integ' = [0] ++ integ
 
-  thrustout = if flying then kp * error + ki * integ else thrustraw
+  thrustout = kp * error + ki * integ
 
   demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)
