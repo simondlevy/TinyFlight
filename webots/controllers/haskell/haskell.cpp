@@ -62,65 +62,6 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 // ---------------------------------------------------------------------------
 
-static float _rad2deg(const float rad)
-{
-    return rad / M_PI * 180;
-}
-
-static void _getVehicleState(
-        WbDeviceTag & gyro, 
-        WbDeviceTag & imu, 
-        WbDeviceTag & gps,
-        state_t & state)
-{
-    // Track previous time and position for calculating motion
-    static float tprev;
-    static float xprev;
-    static float yprev;
-    static float zprev;
-
-    const auto tcurr = wb_robot_get_time();
-    const auto dt =  tcurr - tprev;
-    tprev = tcurr;
-
-    // Get yaw angle in radians
-    auto psi = wb_inertial_unit_get_roll_pitch_yaw(imu)[2];
-
-    // Get state values (meters, degrees) from ground truth:
-    //   x: positive forward
-    //   y: positive leftward
-    //   z: positive upward
-    //   phi, dphi: positive roll right
-    //   theta,dtheta: positive nose up (requires negating imu, gyro)
-    //   psi,dpsi: positive nose left
-    state.z =        wb_gps_get_values(gps)[2];
-    state.phi =     _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
-    state.dphi =    _rad2deg(wb_gyro_get_values(gyro)[0]);
-    state.theta =  -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
-    state.dtheta = -_rad2deg(wb_gyro_get_values(gyro)[1]); 
-    state.psi =     _rad2deg(psi);
-    state.dpsi =    _rad2deg(wb_gyro_get_values(gyro)[2]);
-
-    // Use temporal first difference to get world-cooredinate velocities
-    auto x = wb_gps_get_values(gps)[0];
-    auto y = wb_gps_get_values(gps)[1];
-    auto dx = (x - xprev) / dt;
-    auto dy = (y - yprev) / dt;
-    state.dz = (state.z - zprev) / dt;
-
-    // Rotate X,Y world velocities into body frame to simulate optical-flow
-    // sensor
-    auto cospsi = cos(psi);
-    auto sinpsi = sin(psi);
-    state.dx = dx * cospsi + dy * sinpsi;
-    state.dy = dy * cospsi - dx * sinpsi;
-
-    // Save past time and position for next time step
-    xprev = x;
-    yprev = y;
-    zprev = state.z;
-}
-
 static float _constrain(const float val, const float lo, const float hi)
 {
     return val < lo ? lo : val > hi ? hi : val;
@@ -156,7 +97,7 @@ int main(int argc, char ** argv)
         stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
 
         // Get vehicle state from sensors
-        _getVehicleState(_sim.gyro, _sim.imu, _sim.gps, stream_vehicleState);
+        Quadcopter::getVehicleState(_sim.gyro, _sim.imu, _sim.gps, stream_vehicleState);
 
         // Integrate stick demand to get altitude target
         altitudeTarget = _constrain(
