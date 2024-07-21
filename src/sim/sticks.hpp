@@ -95,22 +95,33 @@ class Sticks {
 
             // Negative throttle value indicates springy throttle
 
-            //                                                        T   R   P  Y 
             // Linux
-            { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-2,  3, -4, 1} },
-            { "SHANWAN Android Gamepad",             joystickAxes_t {-2,  3, -4, 1} },
-            { "Logitech Logitech Extreme 3D",        joystickAxes_t {-4,  1, -2, 3}  },
-            { "Logitech Gamepad F310",               joystickAxes_t {-2,  4, -5, 1} },
-            { "FrSky FrSky Simulator",               joystickAxes_t { 1,  2,  3, 4} },
-            { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1} },
+            { "MY-POWER CO.,LTD. 2In1 USB Joystick",
+                joystickAxes_t {-2,  3, -4, 1} },
+            { "SHANWAN Android Gamepad",
+                joystickAxes_t {-2,  3, -4, 1} },
+            { "Logitech Logitech Extreme 3D",
+                joystickAxes_t {-4,  1, -2, 3}  },
+            { "Logitech Gamepad F310",
+                joystickAxes_t {-2,  4, -5, 1} },
+            { "FrSky FrSky Simulator",
+                joystickAxes_t { 1,  2,  3, 4} },
+            { "Horizon Hobby SPEKTRUM RECEIVER",
+                joystickAxes_t { 2,  3,  4, 1} },
 
             // Windows
-            { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2} },
-            { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2} },
-            { "Controller (Gamepad F310)",           joystickAxes_t {-1,  4, -3, 2} },
-            { "Logitech Extreme 3D",                 joystickAxes_t { 0,  2, -1, 3} },
-            { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3} },
-            { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4} },
+            { "2In1 USB Joystick",
+                joystickAxes_t {-1,  4, -3, 2} },
+            { "Controller (XBOX 360 For Windows)",
+                joystickAxes_t {-1,  4, -3, 2} },
+            { "Controller (Gamepad F310)",
+                joystickAxes_t {-1,  4, -3, 2} },
+            { "Logitech Extreme 3D",
+                joystickAxes_t { 0,  2, -1, 3} },
+            { "FrSky Simulator",
+                joystickAxes_t { 6,  5,  4, 3} },
+            { "SPEKTRUM RECEIVER",
+                joystickAxes_t { 3,  2,  1, 4} },
         };
 
         static float scaleJoystickAxis(const int32_t rawval)
@@ -155,17 +166,19 @@ class Sticks {
         // 1. Check for Logitech Extreme Pro 3D on Windows; have to use buttons
         // for throttle.
         //
-        // 2. Starting at low throttle (as we should) produces an initial stick value
-        // of zero.  So we check for this and adjust as needed.
+        // 2. Starting at low throttle (as we should) produces an initial stick
+        // value of zero.  So we check for this and adjust as needed.
         //
-        static float readJoystickThrust(const char * name, const joystickAxes_t axes)
+        static float readJoystickThrust(
+                const char * name, const joystickAxes_t axes)
         {
             return !strcmp(name, "Logitech Extreme 3D") ? 
                 readThrottleExtremeWindows() : 
                 readThrottleNormal(axes);
         }
 
-        void readJoystick(float & throttle, float & roll, float & pitch, float & yaw)
+        void readJoystick(
+                float & throttle, float & roll, float & pitch, float & yaw)
         {
             auto joyname = wb_joystick_get_model();
 
@@ -261,7 +274,8 @@ class Sticks {
 
         static void reportJoystick(void)
         {
-            printf("Unrecognized joystick '%s' with axes ", wb_joystick_get_model()); 
+            printf("Unrecognized joystick '%s' with axes ",
+                    wb_joystick_get_model()); 
 
             for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
 
