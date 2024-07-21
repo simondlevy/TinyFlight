@@ -43,7 +43,9 @@ typedef struct {
 // angular velocity in degrees/second.
 typedef struct {
 
+    float x;       // positive forward
     float dx;      // positive forward
+    float y;       // positive leftward
     float dy;      // positive leftward
     float z;       // positive upward
     float dz;      // positive upward
@@ -53,8 +55,6 @@ typedef struct {
     float dtheta;  // positive nose up (opposite of gyro Y)
     float psi;     // positive nose left
     float dpsi;    // positive nose left
-
-    float z_dz;    // combination of Z and DZ for Python client
 
 } state_t;
 
