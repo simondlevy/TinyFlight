@@ -93,8 +93,6 @@ spec = do
 
     trigger "setMotors" true [arg $ me_ne, arg $ m_se, arg $ m_sw, arg $ m_nw] 
 
-    trigger "debugDemands" true [arg $ roll demands, arg $ pitch demands]
-
 -- Compile the spec
 main = reify spec >>= 
   compileWith (CSettings "copilot_step_core" ".") "copilot_core"
