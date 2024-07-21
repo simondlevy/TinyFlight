@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module Quadcopter where
+module CoreTask where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -52,12 +52,6 @@ demandsStruct = extern "stream_stickDemands" Nothing
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
-inFlyingMode :: SBool
-inFlyingMode = extern "stream_inFlyingMode" Nothing
-
-resetPids :: SBool
-resetPids = extern "stream_resetPids" Nothing
-
 step = (motors, stickDemands) where
 
   vehicleState = liftState stateStruct
@@ -65,6 +59,10 @@ step = (motors, stickDemands) where
   stickDemands = liftDemands demandsStruct
 
   dt = rateToPeriod clock_rate
+
+  resetPids = false
+
+  inFlyingMode = false
 
   pids = [positionPid resetPids dt,
           pitchRollAnglePid resetPids dt,

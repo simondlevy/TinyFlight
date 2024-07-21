@@ -26,10 +26,6 @@ demands_t stream_stickDemands;
 
 state_t stream_vehicleState;
 
-bool stream_inFlyingMode;
-
-bool stream_resetPids;
-
 void report(float value)
 {
     printf("%f\n", value);
@@ -44,10 +40,6 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 int main(int argc, char ** argv)
 {
-    stream_inFlyingMode = true;
-
-    stream_resetPids = false;
-
     while (_quadcopter.step(stream_vehicleState, stream_stickDemands)) {
 
         // This function will read the vehicle state and stick-demand stream 
