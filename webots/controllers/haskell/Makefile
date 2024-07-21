@@ -6,11 +6,11 @@ INCLUDE = -I$(CPPDIR)
 
 HASKDIR = ../../../haskell
 
-CXX_SOURCES = simple.cpp copilot_core.cpp
+CXX_SOURCES = haskell.cpp copilot_core.cpp
 
 FILES_TO_REMOVE += copilot*
 
-all: simple
+all: haskell
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/closedloops/*.hs
 	# runhaskell -i$(HASKDIR) -i$(HASKDIR)/closedloops $(HASKDIR)/Core.hs
@@ -49,4 +49,4 @@ WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
 edit:
-	vim simple.cpp
+	vim haskell.cpp
