@@ -96,11 +96,7 @@ class Quadcopter {
             }
         }
 
-        static void getVehicleState(
-                WbDeviceTag & gyro, 
-                WbDeviceTag & imu, 
-                WbDeviceTag & gps,
-                state_t & state)
+        void getVehicleState(state_t & state)
         {
             // Track previous time and position for calculating motion
             static float tprev;

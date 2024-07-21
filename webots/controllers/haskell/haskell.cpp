@@ -97,7 +97,7 @@ int main(int argc, char ** argv)
         stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
 
         // Get vehicle state from sensors
-        Quadcopter::getVehicleState(_sim.gyro, _sim.imu, _sim.gps, stream_vehicleState);
+        _sim.getVehicleState(stream_vehicleState);
 
         // Integrate stick demand to get altitude target
         altitudeTarget = _constrain(
