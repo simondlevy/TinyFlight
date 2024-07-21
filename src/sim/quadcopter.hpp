@@ -123,12 +123,6 @@ class Quadcopter {
         }
     private:
 
-        // https://www.bitcraze.io/documentation/tutorials/
-        //   getting-started-with-flow-deck/
-        static constexpr float ALTITUDE_TARGET_INITIAL = 0.4;
-        static constexpr float ALTITUDE_TARGET_MIN = 0.2;
-        static constexpr float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
-
         int _timestep;
 
         // Motors

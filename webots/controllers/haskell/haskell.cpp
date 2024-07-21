@@ -24,6 +24,7 @@
 #include <webots/robot.h>
 
 #include <datatypes.h>
+#include <sim/quadcopter.hpp>
 #include <sim/sticks.hpp>
 
 // ----------------------------------------------------------------------------
