@@ -35,6 +35,8 @@ static const float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
 
 static const float DT = .01;
 
+static Quadcopter _sim;
+
 static WbDeviceTag _m1_motor;
 static WbDeviceTag _m2_motor;
 static WbDeviceTag _m3_motor;
@@ -68,8 +70,6 @@ void setMotors(float m1, float m2, float m3, float m4)
 }
 
 // ---------------------------------------------------------------------------
-
-static Quadcopter quadcopter;
 
 static WbDeviceTag _makeMotor(const char * name, const float direction)
 {
@@ -140,16 +140,6 @@ static void _getVehicleState(
     zprev = state.z;
 }
 
-static WbDeviceTag _makeSensor(
-        const char * name, 
-        const uint32_t timestep,
-        void (*f)(WbDeviceTag tag, int sampling_period))
-{
-    auto sensor = wb_robot_get_device(name);
-    f(sensor, timestep);
-    return sensor;
-}
-
 static float _constrain(const float val, const float lo, const float hi)
 {
     return val < lo ? lo : val > hi ? hi : val;
@@ -168,12 +158,12 @@ int main(int argc, char ** argv)
     _m4_motor = _makeMotor("m4_motor", -1);
 
     // Initialize sensors
-    auto imu = _makeSensor("inertial_unit", timestep, wb_inertial_unit_enable);
-    auto gyro = _makeSensor("gyro", timestep, wb_gyro_enable);
-    auto gps = _makeSensor("gps", timestep, wb_gps_enable);
-    auto camera = _makeSensor("camera", timestep, wb_camera_enable);
+    auto imu = Quadcopter::makeSensor("inertial_unit", timestep, wb_inertial_unit_enable);
+    auto gyro = Quadcopter::makeSensor("gyro", timestep, wb_gyro_enable);
+    auto gps = Quadcopter::makeSensor("gps", timestep, wb_gps_enable);
+    auto camera = Quadcopter::makeSensor("camera", timestep, wb_camera_enable);
 
-    quadcopter.initSticks();
+    _sim.initSticks();
 
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
 
@@ -187,7 +177,7 @@ int main(int argc, char ** argv)
 
         // Get open-loop demands from input device (keyboard, joystick, etc.)
         float throttle = 0;
-        quadcopter.readSticks(
+        _sim.readSticks(
                 throttle,
                 stream_openLoopDemands.roll, 
                 stream_openLoopDemands.pitch, 

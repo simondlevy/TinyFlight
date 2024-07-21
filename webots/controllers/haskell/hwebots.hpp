@@ -65,6 +65,17 @@ class Quadcopter {
             }
         }
 
+        static WbDeviceTag makeSensor(
+                const char * name, 
+                const uint32_t timestep,
+                void (*f)(WbDeviceTag tag, int sampling_period))
+        {
+            auto sensor = wb_robot_get_device(name);
+            f(sensor, timestep);
+            return sensor;
+        }
+
+
         float throttleTolerance(void)
         {
             return haveJoystick() ? -0.9 : -0.45;
@@ -164,11 +175,11 @@ class Quadcopter {
 
         // Special handling for throttle stick: 
         //
-        // 1. Check for Logitech Extreme Pro 3D on Windows; have to use buttons
-        // for throttle.
+        // 1. Check for Logitech Extreme Pro 3D on Windows; have to use
+        // buttons for throttle.
         //
-        // 2. Starting at low throttle (as we should) produces an initial stick
-        // value of zero.  So we check for this and adjust as needed.
+        // 2. Starting at low throttle (as we should) produces an initial
+        // stick value of zero.  So we check for this and adjust as needed.
         //
         static float readJoystickThrust(
                 const char * name, const joystickAxes_t axes)
