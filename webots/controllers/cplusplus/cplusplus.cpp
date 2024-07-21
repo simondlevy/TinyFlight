@@ -78,32 +78,32 @@ static void getVehicleState(
     auto psi = wb_inertial_unit_get_roll_pitch_yaw(imu)[2];
 
     // Get state variables, negating gyro for nose-right positive
-    state.pos.z  = wb_gps_get_values(gps)[2];
-    state.ang.x  =  Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
-    state.dang.x =  Utils::RAD2DEG*(wb_gyro_get_values(gyro)[0]);
-    state.ang.y  =  Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
-    state.dang.y =  Utils::RAD2DEG*(wb_gyro_get_values(gyro)[1]); 
-    state.ang.z  =  -Utils::RAD2DEG*(psi); 
-    state.dang.z =  -Utils::RAD2DEG*(wb_gyro_get_values(gyro)[2]);
+    state.z  = wb_gps_get_values(gps)[2];
+    state.phi  =  Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
+    state.dphi =  Utils::RAD2DEG*(wb_gyro_get_values(gyro)[0]);
+    state.theta  =  Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
+    state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(gyro)[1]); 
+    state.psi  =  -Utils::RAD2DEG*(psi); 
+    state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(gyro)[2]);
 
     // Use temporal first difference to get world-cooredinate velocities
     auto x = wb_gps_get_values(gps)[0];
     auto y = wb_gps_get_values(gps)[1];
     auto dx = (x - xprev) / dt;
     auto dy = (y - yprev) / dt;
-    state.dpos.z = (state.pos.z - zprev) / dt;
+    state.dz = (state.z - zprev) / dt;
 
     // Rotate X,Y world velocities into body frame to simulate optical-flow
     // sensor
     auto cospsi = cos(psi);
     auto sinpsi = sin(psi);
-    state.dpos.x = dx * cospsi + dy * sinpsi;
-    state.dpos.y = dx * sinpsi - dy * cospsi;
+    state.dx = dx * cospsi + dy * sinpsi;
+    state.dy = dx * sinpsi - dy * cospsi;
 
     // Save past time and position for next time step
     xprev = x;
     yprev = y;
-    zprev = state.pos.z;
+    zprev = state.z;
 }
 
 static WbDeviceTag _makeSensor(

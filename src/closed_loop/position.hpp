@@ -14,9 +14,9 @@ class PositionController {
         void run(
                 const state_t & state, const float dt, demands_t & demands) 
         {
-            run_axis(_roll_pid, demands.roll, dt, state.dpos.y);
+            run_axis(_roll_pid, demands.roll, dt, state.dy);
 
-            run_axis(_pitch_pid, demands.pitch, dt, state.dpos.x);
+            run_axis(_pitch_pid, demands.pitch, dt, state.dx);
         }
 
     private:

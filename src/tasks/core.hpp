@@ -46,11 +46,11 @@ class CoreTask {
 
                 // A simple state machine for flying status
                 case STATUS_TAKING_OFF:
-                    _status = state.pos.z > ZGROUND ?  STATUS_FLYING : _status;
+                    _status = state.z > ZGROUND ?  STATUS_FLYING : _status;
                     break;
 
                 case STATUS_FLYING:
-                    _status = state.pos.z <= ZGROUND ? STATUS_LANDED : _status;
+                    _status = state.z <= ZGROUND ? STATUS_LANDED : _status;
                     _altitude_target += THROTTLE_SCALE * openLoopDemands.thrust;
                     break;
 
