@@ -74,13 +74,13 @@ class DebugTask {
         void debugAngles(const state_t & state)
         {
             Serial.printf("roll\t:%+03d pitch:%+03d\tyaw:%+03d\n", 
-                    (int)state.ang.x, (int)state.ang.y, (int)state.ang.z);
+                    (int)state.phi (int)state.theta (int)state.psi);
         }
 
         void debugDangles(const state_t & state)
         {
             Serial.printf("droll  :%+03d\tdpitch:%+03d\tdyaw:%+03d\n", 
-                    (int)state.dang.x, (int)state.dang.y, (int)state.dang.z);
+                    (int)state.dphi, (int)state.dtheta, (int)state.dpsi);
         }
 
         void debugMotorCommands(const quad_motors_t & motors) 

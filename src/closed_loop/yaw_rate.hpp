@@ -19,7 +19,7 @@ class YawRateController {
                 demands_t & demands)
         {
             demands.yaw =
-                _pid.run_p(kp, dt, demands.yaw, state.dang.z);
+                _pid.run_p(kp, dt, demands.yaw, state.dpsi);
         }
 
     private:

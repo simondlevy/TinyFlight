@@ -23,9 +23,9 @@ class PitchRollRateController {
         {
             const auto nothrust = demands.thrust == 0;
 
-            run_axis(kp, kd, _roll, demands.roll, dt, state.dang.x, nothrust);
+            run_axis(kp, kd, _roll, demands.roll, dt, state.dphi, nothrust);
 
-            run_axis(kp, kd, _pitch, demands.pitch, dt, state.dang.y, nothrust);
+            run_axis(kp, kd, _pitch, demands.pitch, dt, state.dtheta, nothrust);
         }
 
     private:

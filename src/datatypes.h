@@ -13,10 +13,18 @@ typedef struct {
 // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004)
 typedef struct {
 
-    axis3_t pos;  // x, y, z
-    axis3_t dpos; // dx, dy, dz
-    axis3_t ang;  // phi, theta, psi
-    axis3_t dang; // dphi, dtheta, dpsi
+    float x;
+    float dx;
+    float y;
+    float dy;
+    float z;
+    float dz;
+    float phi;
+    float dphi;
+    float theta;
+    float dtheta;
+    float psi;
+    float dpsi;
 
 } state_t;
 

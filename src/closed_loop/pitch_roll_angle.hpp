@@ -19,9 +19,9 @@ class PitchRollAngleController {
                 const float dt, 
                 demands_t & demands)
         {
-            run_axis(kp, _roll_pid, demands.roll, dt, state.ang.x);
+            run_axis(kp, _roll_pid, demands.roll, dt, state.phi);
 
-            run_axis(kp, _pitch_pid, demands.pitch, dt, state.ang.y);
+            run_axis(kp, _pitch_pid, demands.pitch, dt, state.theta);
         }
 
     private:
