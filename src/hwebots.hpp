@@ -134,10 +134,11 @@ class Quadcopter {
             state.phi = Utils::RAD2DEG*(
                     wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
 
-            state.dphi = _rad2deg(wb_gyro_get_values(_gyro)[0]);
+            state.dphi = Utils::RAD2DEG*(
+                    wb_gyro_get_values(_gyro)[0]);
 
-            state.theta = -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
-            state.dtheta = -_rad2deg(wb_gyro_get_values(_gyro)[1]); 
+            state.theta = _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+            state.dtheta = _rad2deg(wb_gyro_get_values(_gyro)[1]); 
 
             state.psi = _rad2deg(psi);
 
