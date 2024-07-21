@@ -71,16 +71,6 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 // ---------------------------------------------------------------------------
 
-static WbDeviceTag _makeMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction);
-
-    return motor;
-}
-
 static float _rad2deg(const float rad)
 {
     return rad / M_PI * 180;
@@ -152,10 +142,10 @@ int main(int argc, char ** argv)
     const int timestep = (int)wb_robot_get_basic_time_step();
 
     // Initialize motors
-    _m1_motor = _makeMotor("m1_motor", +1);
-    _m2_motor = _makeMotor("m2_motor", -1);
-    _m3_motor = _makeMotor("m3_motor", +1);
-    _m4_motor = _makeMotor("m4_motor", -1);
+    _m1_motor = Quadcopter::makeMotor("m1_motor", +1);
+    _m2_motor = Quadcopter::makeMotor("m2_motor", -1);
+    _m3_motor = Quadcopter::makeMotor("m3_motor", +1);
+    _m4_motor = Quadcopter::makeMotor("m4_motor", -1);
 
     // Initialize sensors
     auto imu = Quadcopter::makeSensor("inertial_unit", timestep, wb_inertial_unit_enable);
