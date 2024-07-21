@@ -1,7 +1,7 @@
 CFLAGS = -Wno-unused-variable
 
 # Needed for datatypes.h
-CPPDIR = ../../../crazyflie/src
+CPPDIR = ../../../src
 INCLUDE = -I$(CPPDIR)
 
 HASKDIR = ../../../haskell

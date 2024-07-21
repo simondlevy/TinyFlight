@@ -48,7 +48,7 @@ static WbDeviceTag _m4_motor;
 
 demands_t stream_openLoopDemands;
 
-vehicleState_t stream_vehicleState;
+state_t stream_vehicleState;
 
 bool stream_inFlyingMode;
 

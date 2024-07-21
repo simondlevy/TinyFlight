@@ -12,7 +12,7 @@
 
 #include <tasks/core.hpp>
 
-#include <sim/sticks.hpp>
+#include "sticks.hpp"
 
 // ----------------------------------------------------------------------------
 
