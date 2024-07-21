@@ -36,6 +36,8 @@ class Quadcopter {
 
         void init(void)
         {
+            wb_robot_init();
+
             const auto timestep = wb_robot_get_basic_time_step();
 
             wb_joystick_enable(timestep);

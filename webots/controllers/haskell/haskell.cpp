@@ -137,8 +137,6 @@ static float _constrain(const float val, const float lo, const float hi)
 
 int main(int argc, char ** argv)
 {
-    wb_robot_init();
-
     _sim.init();
 
     const int timestep = (int)wb_robot_get_basic_time_step();
