@@ -71,7 +71,14 @@ step = (motors, stickDemands) where
 
   dt = rateToPeriod clock_rate
 
+  status = status'
+
+  altitude_target = 0 :: SFloat
+
   status' = [status_landed] ++ status
+
+  altitude_target' = [0] ++ altitude_target
+  
 
   {--
   pids = [positionPid resetPids dt,

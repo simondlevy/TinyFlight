@@ -53,22 +53,19 @@ class CoreTask {
                 INITIAL_ALTITUDE_TARGET :
                 _altitude_target;
 
-            switch (_status) {
+            _status = 
 
-                // A simple state machine for flying status
-                case STATUS_TAKING_OFF:
-                    _status = state.z > ZGROUND ?  STATUS_FLYING : _status;
-                    break;
+                _status == STATUS_TAKING_OFF  && state.z > ZGROUND ?  
+                STATUS_FLYING :
 
-                case STATUS_FLYING:
-                    _status = state.z <= ZGROUND ? STATUS_LANDED : _status;
-                    break;
+                _status == STATUS_FLYING && state.z <= ZGROUND ?  
+                STATUS_LANDED :
 
-                default: // LANDED
-                    _status = openLoopDemands.thrust > THROTTLE_ZERO ? 
-                        STATUS_TAKING_OFF : _status;
-                    break;
-            }
+                _status == STATUS_LANDED && 
+                openLoopDemands.thrust > THROTTLE_ZERO ? 
+                STATUS_TAKING_OFF :
+
+                _status;
 
             const auto landed = _status == STATUS_LANDED;
 
