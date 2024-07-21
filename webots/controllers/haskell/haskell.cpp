@@ -153,7 +153,7 @@ int main(int argc, char ** argv)
     auto gps = Quadcopter::makeSensor("gps", timestep, wb_gps_enable);
     auto camera = Quadcopter::makeSensor("camera", timestep, wb_camera_enable);
 
-    _sim.initSticks();
+    _sim.init();
 
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
 

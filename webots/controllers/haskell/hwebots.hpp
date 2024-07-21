@@ -34,7 +34,7 @@ class Quadcopter {
 
     public:
 
-        void initSticks(void)
+        void init(void)
         {
             const auto timestep = wb_robot_get_basic_time_step();
 
@@ -84,11 +84,6 @@ class Quadcopter {
             wb_motor_set_velocity(motor, direction);
 
             return motor;
-        }
-
-        float throttleTolerance(void)
-        {
-            return haveJoystick() ? -0.9 : -0.45;
         }
 
     private:
