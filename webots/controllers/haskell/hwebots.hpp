@@ -42,7 +42,22 @@ class Quadcopter {
 
             wb_joystick_enable(timestep);
             wb_keyboard_enable(timestep);
+
+            _m1_motor = makeMotor("m1_motor", +1);
+            _m2_motor = makeMotor("m2_motor", -1);
+            _m3_motor = makeMotor("m3_motor", +1);
+            _m4_motor = makeMotor("m4_motor", -1);
         }
+
+        void setMotors(float m1, float m2, float m3, float m4)
+        {
+            // Set simulated motor values
+            wb_motor_set_velocity(_m1_motor, +m1);
+            wb_motor_set_velocity(_m2_motor, -m2);
+            wb_motor_set_velocity(_m3_motor, +m3);
+            wb_motor_set_velocity(_m4_motor, -m4);
+        }
+
 
         void readSticks(
                 float & throttle, float & roll, float & pitch, float & yaw)
@@ -77,17 +92,6 @@ class Quadcopter {
             return sensor;
         }
 
-        static WbDeviceTag makeMotor(
-                const char * name, const float direction)
-        {
-            auto motor = wb_robot_get_device(name);
-
-            wb_motor_set_position(motor, INFINITY);
-            wb_motor_set_velocity(motor, direction);
-
-            return motor;
-        }
-
     private:
 
         typedef struct {
@@ -106,6 +110,12 @@ class Quadcopter {
             JOYSTICK_RECOGNIZED
 
         } joystickStatus_e;
+
+        WbDeviceTag _m1_motor;
+        WbDeviceTag _m2_motor;
+        WbDeviceTag _m3_motor;
+        WbDeviceTag _m4_motor;
+
 
         // Handles bogus nonzero throttle stick values at startup
         bool ready;
@@ -301,4 +311,16 @@ class Quadcopter {
                 printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
             }
         }
+
+        static WbDeviceTag makeMotor(
+                const char * name, const float direction)
+        {
+            auto motor = wb_robot_get_device(name);
+
+            wb_motor_set_position(motor, INFINITY);
+            wb_motor_set_velocity(motor, direction);
+
+            return motor;
+        }
+
 };

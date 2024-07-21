@@ -37,11 +37,6 @@ static const float DT = .01;
 
 static Quadcopter _sim;
 
-static WbDeviceTag _m1_motor;
-static WbDeviceTag _m2_motor;
-static WbDeviceTag _m3_motor;
-static WbDeviceTag _m4_motor;
-
 
 // These are global so they can be shared with Haskell Copilot ---------------
 
@@ -62,11 +57,7 @@ void copilot_step_core(void);
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    // Set simulated motor values
-    wb_motor_set_velocity(_m1_motor, +m1);
-    wb_motor_set_velocity(_m2_motor, -m2);
-    wb_motor_set_velocity(_m3_motor, +m3);
-    wb_motor_set_velocity(_m4_motor, -m4);
+    _sim.setMotors(m1, m2, m3, m4);
 }
 
 // ---------------------------------------------------------------------------
@@ -140,12 +131,6 @@ int main(int argc, char ** argv)
     _sim.init();
 
     const int timestep = (int)wb_robot_get_basic_time_step();
-
-    // Initialize motors
-    _m1_motor = Quadcopter::makeMotor("m1_motor", +1);
-    _m2_motor = Quadcopter::makeMotor("m2_motor", -1);
-    _m3_motor = Quadcopter::makeMotor("m3_motor", +1);
-    _m4_motor = Quadcopter::makeMotor("m4_motor", -1);
 
     // Initialize sensors
     auto imu = Quadcopter::makeSensor("inertial_unit", timestep,
