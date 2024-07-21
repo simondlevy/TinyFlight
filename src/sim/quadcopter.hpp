@@ -1,5 +1,7 @@
 #pragma once
 
+#include <time.h>
+
 #include <webots/camera.h>
 #include <webots/gps.h>
 #include <webots/gyro.h>
@@ -7,12 +9,8 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
-#include <time.h>
-
 #include <datatypes.h>
 #include <utils.hpp>
-
-#include <tasks/core.hpp>
 
 #include <sim/sticks.hpp>
 
@@ -20,11 +18,11 @@ class Quadcopter {
 
     public:
 
-        void run(void)
+        Quadcopter(void)
         {
             wb_robot_init();
 
-            const int timestep = (int)wb_robot_get_basic_time_step();
+            _timestep = (int)wb_robot_get_basic_time_step();
 
             // Initialize motors
             _m1_motor = _makeMotor("m1_motor", +1);
@@ -33,53 +31,38 @@ class Quadcopter {
             _m4_motor = _makeMotor("m4_motor", -1);
 
             // Initialize sensors
-            auto imu =
-                _makeSensor("inertial_unit", timestep, wb_inertial_unit_enable);
-            auto gyro = _makeSensor("gyro", timestep, wb_gyro_enable);
-            auto gps = _makeSensor("gps", timestep, wb_gps_enable);
-            auto camera = _makeSensor("camera", timestep, wb_camera_enable);
+            _imu =
+                _makeSensor("inertial_unit", _timestep, wb_inertial_unit_enable);
+            _gyro = _makeSensor("gyro", _timestep, wb_gyro_enable);
+            _gps = _makeSensor("gps", _timestep, wb_gps_enable);
+            _camera = _makeSensor("camera", _timestep, wb_camera_enable);
 
             _sticks.init();
+        }
 
-            float altitudeTarget = ALTITUDE_TARGET_INITIAL;
-
-            demands_t demands = {};
-
-            CoreTask coreTask = {};
-
-            coreTask.init(
-                    PITCH_ROLL_ANGLE_KP, 
-                    PITCH_ROLL_RATE_KP, 
-                    PITCH_ROLL_RATE_KD,
-                    YAW_RATE_KP, 
-                    TBASE, 
-                    TSCALE, 
-                    TMIN,
-                    DT);
-
-            while (wb_robot_step(timestep) != -1) {
-
-                //Un-comment if you want to try OpenCV
-                // runCamera(camera);
-
-                // Get open-loop demands from input device (keyboard, joystick,
-                // etc.)
-                _sticks.read(
-                        demands.thrust, demands.roll, demands.pitch, demands.yaw);
-
-                // Get vehicle state from sensors
-                state_t state = {};
-                getVehicleState(gyro, imu, gps, state);
-
-                quad_motors_t motors = {};
-                coreTask.run(state, demands, motors);
-
-                // Set motor velocities from spin magnitudes, with +/-
-                // direction for visual effect
-                setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
-           }
-
+        ~Quadcopter(void)
+        {
             wb_robot_cleanup();
+        }
+
+        bool step(state_t & state, demands_t & demands)
+        {
+            if (wb_robot_step(_timestep) == -1) {
+                return false;
+            }
+
+            //Un-comment if you want to try OpenCV
+            // runCamera(camera);
+
+            // Get open-loop demands from input device (keyboard, joystick,
+            // etc.)
+            _sticks.read(
+                    demands.thrust, demands.roll, demands.pitch, demands.yaw);
+
+            // Get vehicle state from sensors
+            getVehicleState(_gyro, _imu, _gps, state);
+
+            return true;
         }
 
         void setMotors(
@@ -93,34 +76,25 @@ class Quadcopter {
 
     private:
 
-        static constexpr float PITCH_ROLL_ANGLE_KP = 6e0;
-
-        static constexpr float PITCH_ROLL_RATE_KP = 1.25e-2;
-        static constexpr float PITCH_ROLL_RATE_KD = 1.25e-4;
-
-        static constexpr float YAW_RATE_KP = 1.20e-2;
-
-        static constexpr float THROTTLE_TOLERANCE = 0.1;
-
-        // Motor thrust constexprants for climb-rate PID controller
-        static constexpr float TBASE = 56;
-        static constexpr float TSCALE = 0.25;
-        static constexpr float TMIN = 0;
-
         // https://www.bitcraze.io/documentation/tutorials/
         //   getting-started-with-flow-deck/
         static constexpr float ALTITUDE_TARGET_INITIAL = 0.4;
         static constexpr float ALTITUDE_TARGET_MIN = 0.2;
         static constexpr float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
 
-        // Arbitrary time constexprant
-        static constexpr float DT = .01;
+        int _timestep;
 
         // Motors
         WbDeviceTag _m1_motor;
         WbDeviceTag _m2_motor;
         WbDeviceTag _m3_motor;
         WbDeviceTag _m4_motor;
+
+        // Sensors
+        WbDeviceTag _imu;
+        WbDeviceTag _gps;
+        WbDeviceTag _gyro;
+        WbDeviceTag _camera;
 
         Sticks _sticks;
 

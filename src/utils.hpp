@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include <datatypes.h>
 
 #ifndef M_PI
