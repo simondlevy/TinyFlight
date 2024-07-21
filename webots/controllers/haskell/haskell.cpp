@@ -16,13 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <webots/camera.h>
-#include <webots/gps.h>
-#include <webots/gyro.h>
-#include <webots/inertial_unit.h>
-#include <webots/motor.h>
-#include <webots/robot.h>
-
 #include <datatypes.h>
 #include <hwebots.hpp>
 
@@ -71,14 +64,12 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    const int timestep = (int)wb_robot_get_basic_time_step();
-
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
 
     stream_inFlyingMode = true;
     stream_resetPids = false;
 
-    while (wb_robot_step(timestep) != -1) {
+    while (_sim.isRunning()) {
 
         //Un-comment if you want to try OpenCV
         // runCamera(camera);
@@ -111,7 +102,8 @@ int main(int argc, char ** argv)
        copilot_step_core();
     }
 
-    wb_robot_cleanup();
+    _sim.close();
+
 
     return 0;
 }

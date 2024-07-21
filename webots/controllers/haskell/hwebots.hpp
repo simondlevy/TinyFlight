@@ -26,8 +26,13 @@
 #include <map>
 #include <string>
 
+#include <webots/camera.h>
+#include <webots/gps.h>
+#include <webots/gyro.h>
+#include <webots/inertial_unit.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
+#include <webots/motor.h>
 #include <webots/robot.h>
 
 class Quadcopter {
@@ -38,24 +43,29 @@ class Quadcopter {
         {
             wb_robot_init();
 
-            const auto timestep = wb_robot_get_basic_time_step();
+            _timestep = wb_robot_get_basic_time_step();
 
             _imu = Quadcopter::makeSensor("inertial_unit", 
-                    timestep, wb_inertial_unit_enable); 
+                    _timestep, wb_inertial_unit_enable); 
             _gyro = Quadcopter::makeSensor("gyro", 
-                    timestep, wb_gyro_enable);
+                    _timestep, wb_gyro_enable);
             _gps = Quadcopter::makeSensor("gps", 
-                    timestep, wb_gps_enable);
+                    _timestep, wb_gps_enable);
             _camera = Quadcopter::makeSensor("camera", 
-                    timestep, wb_camera_enable);
+                    _timestep, wb_camera_enable);
 
-            wb_joystick_enable(timestep);
-            wb_keyboard_enable(timestep);
+            wb_joystick_enable(_timestep);
+            wb_keyboard_enable(_timestep);
 
             _m1_motor = makeMotor("m1_motor", +1);
             _m2_motor = makeMotor("m2_motor", -1);
             _m3_motor = makeMotor("m3_motor", +1);
             _m4_motor = makeMotor("m4_motor", -1);
+        }
+
+        bool isRunning(void)
+        {
+            return wb_robot_step((int)_timestep) != -1;
         }
 
         void setMotors(float m1, float m2, float m3, float m4)
@@ -141,14 +151,9 @@ class Quadcopter {
             zprev = state.z;
         }
 
-        static WbDeviceTag makeSensor(
-                const char * name, 
-                const uint32_t timestep,
-                void (*f)(WbDeviceTag tag, int sampling_period))
+        void close(void)
         {
-            auto sensor = wb_robot_get_device(name);
-            f(sensor, timestep);
-            return sensor;
+            wb_robot_cleanup();
         }
 
     private:
@@ -169,6 +174,8 @@ class Quadcopter {
             JOYSTICK_RECOGNIZED
 
         } joystickStatus_e;
+
+        double _timestep;
 
         WbDeviceTag _m1_motor;
         WbDeviceTag _m2_motor;
@@ -389,6 +396,16 @@ class Quadcopter {
         static float _rad2deg(const float rad)
         {
             return rad / M_PI * 180;
+        }
+
+        static WbDeviceTag makeSensor(
+                const char * name, 
+                const uint32_t timestep,
+                void (*f)(WbDeviceTag tag, int sampling_period))
+        {
+            auto sensor = wb_robot_get_device(name);
+            f(sensor, timestep);
+            return sensor;
         }
 
 };
