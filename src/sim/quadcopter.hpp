@@ -45,7 +45,7 @@ class Quadcopter {
             wb_robot_cleanup();
         }
 
-        bool step(state_t & state, demands_t & demands)
+        bool getStateAndDemands(state_t & state, demands_t & demands)
         {
             if (wb_robot_step(_timestep) == -1) {
                 return false;

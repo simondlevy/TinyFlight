@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
 
     demands_t demands = {};
 
-    while (quadcopter.step(state, demands)) {
+    while (quadcopter.getStateAndDemands(state, demands)) {
 
         quad_motors_t motors = {};
 
