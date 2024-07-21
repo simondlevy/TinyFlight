@@ -44,9 +44,9 @@ import Position
 import YawAngle
 import YawRate
 
-status_landed     = 0 :: Int8
-status_taking_off = 1 :: Int8
-status_flying     = 2 :: Int8
+status_landed     = 0 :: SInt8
+status_taking_off = 1 :: SInt8
+status_flying     = 2 :: SInt8
 
 -- We consider altitudes below this value to be the ground
 zground = 0.05 :: SFloat
@@ -65,20 +65,26 @@ stateStruct = extern "stream_vehicleState" Nothing
 
 step = (motors, stickDemands) where
 
-  vehicleState = liftState stateStruct
+  state = liftState stateStruct
 
   stickDemands = liftDemands demandsStruct
 
   dt = rateToPeriod clock_rate
 
-  status = status'
+  status = if status == status_taking_off  && (zz state) > zground
+           then status_flying 
+           else if status' == status_flying && (zz state) <= zground 
+           then status_landed 
+           else if status' == status_landed && 
+                (thrust stickDemands) > throttle_zero 
+           then status_taking_off
+           else status'
 
   altitude_target = 0 :: SFloat
 
-  status' = [status_landed] ++ status
+  status' = [0] ++ status
 
   altitude_target' = [0] ++ altitude_target
-  
 
   {--
   pids = [positionPid resetPids dt,

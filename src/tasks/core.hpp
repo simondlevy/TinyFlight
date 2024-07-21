@@ -39,7 +39,7 @@ class CoreTask {
 
          void run(
                  const state_t & state, 
-                 const demands_t & openLoopDemands, 
+                 const demands_t & stickDemands, 
                  quad_motors_t & motors)
         {
             static flyingStatus_e _status;
@@ -48,7 +48,7 @@ class CoreTask {
 
             _altitude_target =
                 _status == STATUS_FLYING ? 
-                _altitude_target + THROTTLE_SCALE * openLoopDemands.thrust :
+                _altitude_target + THROTTLE_SCALE * stickDemands.thrust :
                 _status == STATUS_LANDED ?
                 INITIAL_ALTITUDE_TARGET :
                 _altitude_target;
@@ -62,7 +62,7 @@ class CoreTask {
                 STATUS_LANDED :
 
                 _status == STATUS_LANDED && 
-                openLoopDemands.thrust > THROTTLE_ZERO ? 
+                stickDemands.thrust > THROTTLE_ZERO ? 
                 STATUS_TAKING_OFF :
 
                 _status;
@@ -70,10 +70,10 @@ class CoreTask {
             const auto landed = _status == STATUS_LANDED;
 
             demands_t demands = { 
-                openLoopDemands.thrust,
-                openLoopDemands.roll,
-                openLoopDemands.pitch,
-                openLoopDemands.yaw
+                stickDemands.thrust,
+                stickDemands.roll,
+                stickDemands.pitch,
+                stickDemands.yaw
             };
 
             _positionController.run(state, _dt, demands);  // 
