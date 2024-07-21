@@ -93,6 +93,8 @@ int main(int argc, char ** argv)
         // XXX
         stream_vehicleState.theta *= -1;
         stream_vehicleState.dtheta *= -1;
+        stream_vehicleState.psi *= -1;
+        stream_vehicleState.dpsi *= -1;
 
         // Integrate stick demand to get altitude target
         altitudeTarget = _constrain(

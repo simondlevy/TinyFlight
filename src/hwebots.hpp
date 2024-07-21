@@ -137,12 +137,14 @@ class Quadcopter {
             state.dphi = Utils::RAD2DEG*(
                     wb_gyro_get_values(_gyro)[0]);
 
-            state.theta = _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
-            state.dtheta = _rad2deg(wb_gyro_get_values(_gyro)[1]); 
+            state.theta = Utils::RAD2DEG*(
+                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
 
-            state.psi = _rad2deg(psi);
+            state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
 
-            state.dpsi =_rad2deg(wb_gyro_get_values(_gyro)[2]);
+            state.psi  =  -Utils::RAD2DEG*(psi); 
+
+            state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
 
             // Use temporal first difference to get world-cooredinate velocities
             auto x = wb_gps_get_values(_gps)[0];
