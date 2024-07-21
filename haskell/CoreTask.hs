@@ -51,6 +51,8 @@ status_flying     = 2 :: SInt8
 -- We consider altitudes below this value to be the ground
 zground = 0.05 :: SFloat
 
+initial_altitude_target = 0.2 :: SFloat
+
 -- We consider throttle inputs above this below this value to be positive
 -- for takeoff
 throttle_zero = 0.05 :: SFloat
@@ -71,6 +73,13 @@ step = (motors, stickDemands) where
 
   dt = rateToPeriod clock_rate
 
+  altitude_target = if status == status_flying 
+                    then  altitude_target + throttle_scale * 
+                      (thrust stickDemands)
+                    else if status == status_landed 
+                    then initial_altitude_target 
+                    else altitude_target'
+
   status = if status == status_taking_off  && (zz state) > zground
            then status_flying 
            else if status' == status_flying && (zz state) <= zground 
@@ -79,8 +88,6 @@ step = (motors, stickDemands) where
                 (thrust stickDemands) > throttle_zero 
            then status_taking_off
            else status'
-
-  altitude_target = 0 :: SFloat
 
   status' = [0] ++ status
 
