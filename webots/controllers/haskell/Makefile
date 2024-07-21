@@ -14,7 +14,7 @@ all: haskell
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/closedloops/*.hs
 	# runhaskell -i$(HASKDIR) -i$(HASKDIR)/closedloops $(HASKDIR)/Core.hs
-	runhaskell -i$(HASKDIR) -i$(HASKDIR)/closedloops $(HASKDIR)/Crazyflie.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/closedloops $(HASKDIR)/CoreTask.hs
 	mv copilot_core.c copilot_core.cpp
 
 size: copilot_core.cpp

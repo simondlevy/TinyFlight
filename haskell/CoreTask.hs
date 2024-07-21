@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module Crazyflie where
+module CoreTask where
 
 import Language.Copilot
 import Copilot.Compile.C99
