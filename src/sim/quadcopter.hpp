@@ -74,50 +74,6 @@ class Quadcopter {
             wb_motor_set_velocity(_m4_motor, -m4);
         }
 
-    private:
-
-        // https://www.bitcraze.io/documentation/tutorials/
-        //   getting-started-with-flow-deck/
-        static constexpr float ALTITUDE_TARGET_INITIAL = 0.4;
-        static constexpr float ALTITUDE_TARGET_MIN = 0.2;
-        static constexpr float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
-
-        int _timestep;
-
-        // Motors
-        WbDeviceTag _m1_motor;
-        WbDeviceTag _m2_motor;
-        WbDeviceTag _m3_motor;
-        WbDeviceTag _m4_motor;
-
-        // Sensors
-        WbDeviceTag _imu;
-        WbDeviceTag _gps;
-        WbDeviceTag _gyro;
-        WbDeviceTag _camera;
-
-        Sticks _sticks;
-
-        static WbDeviceTag _makeMotor(const char * name, const float direction)
-        {
-            auto motor = wb_robot_get_device(name);
-
-            wb_motor_set_position(motor, INFINITY);
-            wb_motor_set_velocity(motor, direction);
-
-            return motor;
-        }
-
-        static WbDeviceTag _makeSensor(
-                const char * name, 
-                const uint32_t timestep,
-                void (*f)(WbDeviceTag tag, int sampling_period))
-        {
-            auto sensor = wb_robot_get_device(name);
-            f(sensor, timestep);
-            return sensor;
-        }
-
         void getVehicleState(state_t & state)
         {
             // Track previous time and position for calculating motion
@@ -165,5 +121,49 @@ class Quadcopter {
             yprev = y;
             zprev = state.z;
         }
+    private:
+
+        // https://www.bitcraze.io/documentation/tutorials/
+        //   getting-started-with-flow-deck/
+        static constexpr float ALTITUDE_TARGET_INITIAL = 0.4;
+        static constexpr float ALTITUDE_TARGET_MIN = 0.2;
+        static constexpr float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
+
+        int _timestep;
+
+        // Motors
+        WbDeviceTag _m1_motor;
+        WbDeviceTag _m2_motor;
+        WbDeviceTag _m3_motor;
+        WbDeviceTag _m4_motor;
+
+        // Sensors
+        WbDeviceTag _imu;
+        WbDeviceTag _gps;
+        WbDeviceTag _gyro;
+        WbDeviceTag _camera;
+
+        Sticks _sticks;
+
+        static WbDeviceTag _makeMotor(const char * name, const float direction)
+        {
+            auto motor = wb_robot_get_device(name);
+
+            wb_motor_set_position(motor, INFINITY);
+            wb_motor_set_velocity(motor, direction);
+
+            return motor;
+        }
+
+        static WbDeviceTag _makeSensor(
+                const char * name, 
+                const uint32_t timestep,
+                void (*f)(WbDeviceTag tag, int sampling_period))
+        {
+            auto sensor = wb_robot_get_device(name);
+            f(sensor, timestep);
+            return sensor;
+        }
+
 };
 

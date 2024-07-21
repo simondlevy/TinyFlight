@@ -23,8 +23,6 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
-#include <time.h>
-
 #include <datatypes.h>
 #include <sim/sticks.hpp>
 
@@ -157,15 +155,6 @@ static float _constrain(const float val, const float lo, const float hi)
     return val < lo ? lo : val > hi ? hi : val;
 }
 
-static uint32_t _timesec(void)
-{
-    struct timespec spec = {};
-    clock_gettime(CLOCK_REALTIME, &spec);
-    return spec.tv_sec; 
-}
-
-
-
 int main(int argc, char ** argv)
 {
     wb_robot_init();
@@ -187,8 +176,6 @@ int main(int argc, char ** argv)
     _sticks.init();
 
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
-
-    auto sec_start = _timesec();
 
     stream_inFlyingMode = true;
     stream_resetPids = false;
@@ -224,8 +211,6 @@ int main(int argc, char ** argv)
                 (ALTITUDE_TARGET_MAX - ALTITUDE_TARGET_MIN)) - 1;
 
        copilot_step_core();
-
-        //report(sec_start);
     }
 
     wb_robot_cleanup();
