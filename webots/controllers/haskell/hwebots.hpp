@@ -34,22 +34,17 @@ class Quadcopter {
 
     public:
 
-        WbDeviceTag gps;
-        WbDeviceTag gyro;
-        WbDeviceTag imu;
-
-
         void init(void)
         {
             wb_robot_init();
 
             const auto timestep = wb_robot_get_basic_time_step();
 
-            imu = Quadcopter::makeSensor("inertial_unit", 
+            _imu = Quadcopter::makeSensor("inertial_unit", 
                     timestep, wb_inertial_unit_enable); 
-            gyro = Quadcopter::makeSensor("gyro", 
+            _gyro = Quadcopter::makeSensor("gyro", 
                     timestep, wb_gyro_enable);
-            gps = Quadcopter::makeSensor("gps", 
+            _gps = Quadcopter::makeSensor("gps", 
                     timestep, wb_gps_enable);
             _camera = Quadcopter::makeSensor("camera", 
                     timestep, wb_camera_enable);
@@ -109,7 +104,7 @@ class Quadcopter {
             tprev = tcurr;
 
             // Get yaw angle in radians
-            auto psi = wb_inertial_unit_get_roll_pitch_yaw(imu)[2];
+            auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
             // Get state values (meters, degrees) from ground truth:
             //   x: positive forward
@@ -118,17 +113,17 @@ class Quadcopter {
             //   phi, dphi: positive roll right
             //   theta,dtheta: positive nose up (requires negating imu, gyro)
             //   psi,dpsi: positive nose left
-            state.z =        wb_gps_get_values(gps)[2];
-            state.phi =     _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
-            state.dphi =    _rad2deg(wb_gyro_get_values(gyro)[0]);
-            state.theta =  -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
-            state.dtheta = -_rad2deg(wb_gyro_get_values(gyro)[1]); 
+            state.z =        wb_gps_get_values(_gps)[2];
+            state.phi =     _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
+            state.dphi =    _rad2deg(wb_gyro_get_values(_gyro)[0]);
+            state.theta =  -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+            state.dtheta = -_rad2deg(wb_gyro_get_values(_gyro)[1]); 
             state.psi =     _rad2deg(psi);
-            state.dpsi =    _rad2deg(wb_gyro_get_values(gyro)[2]);
+            state.dpsi =    _rad2deg(wb_gyro_get_values(_gyro)[2]);
 
             // Use temporal first difference to get world-cooredinate velocities
-            auto x = wb_gps_get_values(gps)[0];
-            auto y = wb_gps_get_values(gps)[1];
+            auto x = wb_gps_get_values(_gps)[0];
+            auto y = wb_gps_get_values(_gps)[1];
             auto dx = (x - xprev) / dt;
             auto dy = (y - yprev) / dt;
             state.dz = (state.z - zprev) / dt;
@@ -145,7 +140,6 @@ class Quadcopter {
             yprev = y;
             zprev = state.z;
         }
-
 
         static WbDeviceTag makeSensor(
                 const char * name, 
@@ -181,7 +175,11 @@ class Quadcopter {
         WbDeviceTag _m3_motor;
         WbDeviceTag _m4_motor;
 
+        WbDeviceTag _gps;
+        WbDeviceTag _gyro;
+        WbDeviceTag _imu;
         WbDeviceTag _camera;
+
         // Handles bogus nonzero throttle stick values at startup
         bool ready;
 
