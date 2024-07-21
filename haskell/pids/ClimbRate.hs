@@ -47,10 +47,10 @@ run dt thrust dz = thrust'  where
 
 --}
 
-climbRatePid flying dt state demands = demands' where
+climbRatePid state dt tbase tscale tmin flying demands = demands' where
 
-    thrustraw = thrust demands
+    thrustpid = run dt (thrust demands) (dz state)
 
-    thrustout = if flying then run dt thrustraw (dz state) else thrustraw
+    thrustout = if flying then thrustpid * tscale + tbase else tmin
 
     demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)

@@ -99,6 +99,8 @@ step = (motors, stickDemands) where
 
   demands' = altitudePid state dt altitude_target demands
 
+  demands'' = climbRatePid state dt tbase tscale tmin (not landed) demands
+
   {--
   pids = [positionPid resetPids dt,
           pitchRollAnglePid resetPids dt,
