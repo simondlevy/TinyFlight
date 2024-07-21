@@ -139,6 +139,8 @@ int main(int argc, char ** argv)
 {
     wb_robot_init();
 
+    _sim.init();
+
     const int timestep = (int)wb_robot_get_basic_time_step();
 
     // Initialize motors
@@ -148,12 +150,11 @@ int main(int argc, char ** argv)
     _m4_motor = Quadcopter::makeMotor("m4_motor", -1);
 
     // Initialize sensors
-    auto imu = Quadcopter::makeSensor("inertial_unit", timestep, wb_inertial_unit_enable);
+    auto imu = Quadcopter::makeSensor("inertial_unit", timestep,
+            wb_inertial_unit_enable); 
     auto gyro = Quadcopter::makeSensor("gyro", timestep, wb_gyro_enable);
     auto gps = Quadcopter::makeSensor("gps", timestep, wb_gps_enable);
     auto camera = Quadcopter::makeSensor("camera", timestep, wb_camera_enable);
-
-    _sim.init();
 
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
 
