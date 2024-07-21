@@ -1,3 +1,5 @@
+#pragma once
+
 #include <datatypes.h>
 #include <mixers.hpp>
 #include <utils.hpp>
