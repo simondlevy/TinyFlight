@@ -24,7 +24,7 @@ module YawAngle where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Pid
+import ClosedLoop
 import Demands
 import State
 import Utils

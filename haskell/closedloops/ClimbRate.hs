@@ -1,5 +1,5 @@
 {--
-  Altitude PID control algorithm for real and simulated flight controllers
+  Climb-rate algorithm for real and simulated flight controllers
  
   Copyright (C) 2024 Simon D. Levy
  
@@ -19,35 +19,38 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module Altitude where
+module ClimbRate where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
+import ClosedLoop
 import Demands
 import State
 import Utils
 
+run dt thrust dz = thrust'  where
+
+    kp = 25
+    ki = 15
+    ilimit = 5000
+
+    (thrust', integ) = piController kp ki dt ilimit thrust dz integ'
+
+    integ' = [0] ++ integ
+
+
 {-- 
 
-  Demand is input as normalized altitude target in meters and output as 
-  climb rate in meters-per-second
+  Demand is input as climb rate in meters per second and output as arbitrary
+  positive value to be scaled according to motor characteristics.
 
 --}
 
-altitudePid state dt target demands = demands'  where
+climbRatePid flying dt state demands = demands' where
 
-  kp = 2.0
-  ki = 0.5
-  ilimit = 5000
+    thrustraw = thrust demands
 
-  error = target - (zz state)
+    thrustout = if flying then run dt thrustraw (dz state) else thrustraw
 
-  -- Reset integral when not in flying mode (flying)
-  integ = constrain (integ' + error * dt) (-ilimit) ilimit
-
-  integ' = [0] ++ integ
-
-  thrustout = kp * error + ki * integ
-
-  demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)
+    demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)
