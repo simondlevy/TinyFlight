@@ -16,34 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <webots/camera.h>
-#include <webots/gps.h>
-#include <webots/gyro.h>
-#include <webots/inertial_unit.h>
-#include <webots/motor.h>
-#include <webots/robot.h>
-
-#include <time.h>
-
-#include <datatypes.h>
-
-#include "sticks.hpp"
-
-// ----------------------------------------------------------------------------
-
-// https://www.bitcraze.io/documentation/tutorials/getting-started-with-flow-deck/
-static const float ALTITUDE_TARGET_INITIAL = 0.4;
-static const float ALTITUDE_TARGET_MIN = 0.2;
-static const float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
-
-static const float DT = .01;
-
-static WbDeviceTag _m1_motor;
-static WbDeviceTag _m2_motor;
-static WbDeviceTag _m3_motor;
-static WbDeviceTag _m4_motor;
-
-
 // These are global so they can be shared with Haskell Copilot ---------------
 
 demands_t stream_openLoopDemands;

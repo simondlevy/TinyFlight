@@ -76,13 +76,19 @@ class Quadcopter {
 
                 // Set motor velocities from spin magnitudes, with +/-
                 // direction for visual effect
-                wb_motor_set_velocity(_m1_motor, +motors.m1);
-                wb_motor_set_velocity(_m2_motor, -motors.m2);
-                wb_motor_set_velocity(_m3_motor, +motors.m3);
-                wb_motor_set_velocity(_m4_motor, -motors.m4);
-            }
+                setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
+           }
 
             wb_robot_cleanup();
+        }
+
+        void setMotors(
+                const float m1, const float m2, const float m3, const float m4)
+        {
+            wb_motor_set_velocity(_m1_motor, +m1);
+            wb_motor_set_velocity(_m2_motor, -m2);
+            wb_motor_set_velocity(_m3_motor, +m3);
+            wb_motor_set_velocity(_m4_motor, -m4);
         }
 
     private:
