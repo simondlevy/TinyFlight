@@ -60,7 +60,7 @@ class Quadcopter {
                     demands.thrust, demands.roll, demands.pitch, demands.yaw);
 
             // Get vehicle state from sensors
-            getVehicleState(_gyro, _imu, _gps, state);
+            getVehicleState(state);
 
             return true;
         }
@@ -118,11 +118,7 @@ class Quadcopter {
             return sensor;
         }
 
-        static void getVehicleState(
-                const WbDeviceTag & gyro, 
-                const WbDeviceTag & imu, 
-                const WbDeviceTag & gps,
-                state_t & state)
+        void getVehicleState(state_t & state)
         {
             // Track previous time and position for calculating motion
             static float tprev;
@@ -135,30 +131,30 @@ class Quadcopter {
             tprev = tcurr;
 
             // Get yaw angle in radians
-            auto psi = wb_inertial_unit_get_roll_pitch_yaw(imu)[2];
+            auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
             // Get state variables, negating gyro for nose-right positive
-            state.z  = wb_gps_get_values(gps)[2];
+            state.z  = wb_gps_get_values(_gps)[2];
             state.phi = 
-                Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
+                Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
             state.dphi = 
-                Utils::RAD2DEG*(wb_gyro_get_values(gyro)[0]);
+                Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[0]);
             state.theta = 
-                Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
+                Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
 
-            state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(gyro)[1]); 
+            state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
             state.psi  =  -Utils::RAD2DEG*(psi); 
-            state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(gyro)[2]);
+            state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
 
             // Use temporal first difference to get world-cooredinate velocities
-            auto x = wb_gps_get_values(gps)[0];
-            auto y = wb_gps_get_values(gps)[1];
+            auto x = wb_gps_get_values(_gps)[0];
+            auto y = wb_gps_get_values(_gps)[1];
             auto dx = (x - xprev) / dt;
             auto dy = (y - yprev) / dt;
             state.dz = (state.z - zprev) / dt;
 
-            // Rotate X,Y world velocities into body frame to simulate optical-flow
-            // sensor
+            // Rotate X,Y world velocities into body frame to simulate
+            // optical-flow sensor
             auto cospsi = cos(psi);
             auto sinpsi = sin(psi);
             state.dx = dx * cospsi + dy * sinpsi;
@@ -169,6 +165,5 @@ class Quadcopter {
             yprev = y;
             zprev = state.z;
         }
-
 };
 

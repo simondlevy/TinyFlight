@@ -91,7 +91,8 @@ static float _rad2deg(const float rad)
 static void _getVehicleState(
         WbDeviceTag & gyro, 
         WbDeviceTag & imu, 
-        WbDeviceTag & gps)
+        WbDeviceTag & gps,
+        state_t & state)
 {
     // Track previous time and position for calculating motion
     static float tprev;
@@ -113,32 +114,32 @@ static void _getVehicleState(
     //   phi, dphi: positive roll right
     //   theta,dtheta: positive nose up (requires negating imu, gyro)
     //   psi,dpsi: positive nose left
-    stream_vehicleState.z = wb_gps_get_values(gps)[2];
-    stream_vehicleState.phi =     _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
-    stream_vehicleState.dphi =    _rad2deg(wb_gyro_get_values(gyro)[0]);
-    stream_vehicleState.theta =  -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
-    stream_vehicleState.dtheta = -_rad2deg(wb_gyro_get_values(gyro)[1]); 
-    stream_vehicleState.psi =     _rad2deg(psi);
-    stream_vehicleState.dpsi =    _rad2deg(wb_gyro_get_values(gyro)[2]);
+    state.z =        wb_gps_get_values(gps)[2];
+    state.phi =     _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
+    state.dphi =    _rad2deg(wb_gyro_get_values(gyro)[0]);
+    state.theta =  -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
+    state.dtheta = -_rad2deg(wb_gyro_get_values(gyro)[1]); 
+    state.psi =     _rad2deg(psi);
+    state.dpsi =    _rad2deg(wb_gyro_get_values(gyro)[2]);
 
     // Use temporal first difference to get world-cooredinate velocities
     auto x = wb_gps_get_values(gps)[0];
     auto y = wb_gps_get_values(gps)[1];
     auto dx = (x - xprev) / dt;
     auto dy = (y - yprev) / dt;
-    stream_vehicleState.dz = (stream_vehicleState.z - zprev) / dt;
+    state.dz = (state.z - zprev) / dt;
 
     // Rotate X,Y world velocities into body frame to simulate optical-flow
     // sensor
     auto cospsi = cos(psi);
     auto sinpsi = sin(psi);
-    stream_vehicleState.dx = dx * cospsi + dy * sinpsi;
-    stream_vehicleState.dy = dy * cospsi - dx * sinpsi;
+    state.dx = dx * cospsi + dy * sinpsi;
+    state.dy = dy * cospsi - dx * sinpsi;
 
     // Save past time and position for next time step
     xprev = x;
     yprev = y;
-    zprev = stream_vehicleState.z;
+    zprev = state.z;
 }
 
 static WbDeviceTag _makeSensor(
@@ -211,7 +212,7 @@ int main(int argc, char ** argv)
         stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
 
         // Get vehicle state from sensors
-        _getVehicleState(gyro, imu, gps);
+        _getVehicleState(gyro, imu, gps, stream_vehicleState);
 
         // Integrate stick demand to get altitude target
         altitudeTarget = _constrain(
