@@ -89,9 +89,15 @@ step = (motors, stickDemands) where
            then status_taking_off
            else status'
 
+  landed = status == status_landed
+
   status' = [0] ++ status
 
   altitude_target' = [0] ++ altitude_target
+
+  demands = stickDemands
+
+  demands' = altitudePid state dt altitude_target demands
 
   {--
   pids = [positionPid resetPids dt,
@@ -107,7 +113,6 @@ step = (motors, stickDemands) where
   thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) else tmin
   --}
 
-  demands' = stickDemands
 
   thrust'' = thrust stickDemands
 
