@@ -44,6 +44,15 @@ class CoreTask {
         {
             static flyingStatus_e _status;
 
+            static float _altitude_target;
+
+            _altitude_target =
+                _status == STATUS_FLYING ? 
+                _altitude_target + THROTTLE_SCALE * openLoopDemands.thrust :
+                _status == STATUS_LANDED ?
+                INITIAL_ALTITUDE_TARGET :
+                _altitude_target;
+
             switch (_status) {
 
                 // A simple state machine for flying status
@@ -53,13 +62,11 @@ class CoreTask {
 
                 case STATUS_FLYING:
                     _status = state.z <= ZGROUND ? STATUS_LANDED : _status;
-                    _altitude_target += THROTTLE_SCALE * openLoopDemands.thrust;
                     break;
 
                 default: // LANDED
                     _status = openLoopDemands.thrust > THROTTLE_ZERO ? 
                         STATUS_TAKING_OFF : _status;
-                    _altitude_target = INITIAL_ALTITUDE_TARGET;
                     break;
             }
 
@@ -123,8 +130,6 @@ class CoreTask {
          float _tscale; 
          float _tmin;
          float _dt;
-
-         float _altitude_target;
 
          PositionController _positionController;
          PitchRollAngleController _pitchRollAngleController;

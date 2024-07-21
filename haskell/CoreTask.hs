@@ -44,11 +44,18 @@ import Position
 import YawAngle
 import YawRate
 
--- Streams from C++ ----------------------------------------------------------
-
 status_landed     = 0 :: Int8
 status_taking_off = 1 :: Int8
 status_flying     = 2 :: Int8
+
+-- We consider altitudes below this value to be the ground
+zground = 0.05 :: SFloat
+
+-- We consider throttle inputs above this below this value to be positive
+-- for takeoff
+throttle_zero = 0.05 :: SFloat
+
+throttle_scale = 0.005 :: SFloat
 
 demandsStruct :: Stream DemandsStruct
 demandsStruct = extern "stream_stickDemands" Nothing
@@ -63,8 +70,6 @@ step = (motors, stickDemands) where
   stickDemands = liftDemands demandsStruct
 
   dt = rateToPeriod clock_rate
-
-  status = status'
 
   status' = [status_landed] ++ status
 
