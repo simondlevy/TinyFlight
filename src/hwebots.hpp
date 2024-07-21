@@ -1,5 +1,5 @@
 /**
- * Gamepad / joystick / keyboard support for Webots
+ * Webots support
  *
  * Copyright (C) 2024 Simon D. Levy
  *
@@ -22,9 +22,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-
 #include <map>
 #include <string>
+
+#include <utils.hpp>
 
 #include <webots/camera.h>
 #include <webots/gps.h>
@@ -63,20 +64,27 @@ class Quadcopter {
             _m4_motor = makeMotor("m4_motor", -1);
         }
 
+        ~Quadcopter(void)
+        {
+            wb_robot_cleanup();
+        }
+
         bool isRunning(void)
         {
             return wb_robot_step((int)_timestep) != -1;
         }
 
-        void setMotors(float m1, float m2, float m3, float m4)
+        void setMotors(
+                const float m1, 
+                const float m2, 
+                const float m3, 
+                const float m4)
         {
-            // Set simulated motor values
             wb_motor_set_velocity(_m1_motor, +m1);
             wb_motor_set_velocity(_m2_motor, -m2);
             wb_motor_set_velocity(_m3_motor, +m3);
             wb_motor_set_velocity(_m4_motor, -m4);
         }
-
 
         void readSticks(
                 float & throttle, float & roll, float & pitch, float & yaw)
@@ -101,6 +109,11 @@ class Quadcopter {
             }
         }
 
+        void close(void)
+        {
+            wb_robot_cleanup();
+        }
+
         void getVehicleState(state_t & state)
         {
             // Track previous time and position for calculating motion
@@ -116,20 +129,19 @@ class Quadcopter {
             // Get yaw angle in radians
             auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
-            // Get state values (meters, degrees) from ground truth:
-            //   x: positive forward
-            //   y: positive leftward
-            //   z: positive upward
-            //   phi, dphi: positive roll right
-            //   theta,dtheta: positive nose up (requires negating imu, gyro)
-            //   psi,dpsi: positive nose left
-            state.z =        wb_gps_get_values(_gps)[2];
-            state.phi =     _rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
-            state.dphi =    _rad2deg(wb_gyro_get_values(_gyro)[0]);
-            state.theta =  -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+            state.z = wb_gps_get_values(_gps)[2];
+
+            state.phi = Utils::RAD2DEG*(
+                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
+
+            state.dphi = _rad2deg(wb_gyro_get_values(_gyro)[0]);
+
+            state.theta = -_rad2deg(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
             state.dtheta = -_rad2deg(wb_gyro_get_values(_gyro)[1]); 
-            state.psi =     _rad2deg(psi);
-            state.dpsi =    _rad2deg(wb_gyro_get_values(_gyro)[2]);
+
+            state.psi = _rad2deg(psi);
+
+            state.dpsi =_rad2deg(wb_gyro_get_values(_gyro)[2]);
 
             // Use temporal first difference to get world-cooredinate velocities
             auto x = wb_gps_get_values(_gps)[0];
@@ -149,11 +161,6 @@ class Quadcopter {
             xprev = x;
             yprev = y;
             zprev = state.z;
-        }
-
-        void close(void)
-        {
-            wb_robot_cleanup();
         }
 
     private:

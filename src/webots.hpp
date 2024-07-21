@@ -1,13 +1,31 @@
+/**
+ * Webots support
+ *
+ * Copyright (C) 2024 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-#include <time.h>
 #include <map>
 #include <string>
 
+#include <utils.hpp>
 
 #include <webots/camera.h>
 #include <webots/gps.h>
@@ -17,9 +35,6 @@
 #include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-
-#include <datatypes.h>
-#include <utils.hpp>
 
 class Quadcopter {
 
@@ -31,24 +46,72 @@ class Quadcopter {
 
             _timestep = (int)wb_robot_get_basic_time_step();
 
-            // Initialize motors
+            // Initialize sensors
+            _imu = _makeSensor("inertial_unit",
+                    _timestep, wb_inertial_unit_enable);
+            _gyro = _makeSensor("gyro",
+                    _timestep, wb_gyro_enable);
+            _gps = _makeSensor("gps",
+                    _timestep, wb_gps_enable);
+            _camera = _makeSensor("camera",
+                    _timestep, wb_camera_enable);
+
+            wb_joystick_enable(_timestep);
+            wb_keyboard_enable(_timestep);
+
             _m1_motor = _makeMotor("m1_motor", +1);
             _m2_motor = _makeMotor("m2_motor", -1);
             _m3_motor = _makeMotor("m3_motor", +1);
             _m4_motor = _makeMotor("m4_motor", -1);
 
-            // Initialize sensors
-            _imu =
-                _makeSensor("inertial_unit", _timestep, wb_inertial_unit_enable);
-            _gyro = _makeSensor("gyro", _timestep, wb_gyro_enable);
-            _gps = _makeSensor("gps", _timestep, wb_gps_enable);
-            _camera = _makeSensor("camera", _timestep, wb_camera_enable);
-
-            wb_joystick_enable(_timestep);
-            wb_keyboard_enable(_timestep);
         }
 
         ~Quadcopter(void)
+        {
+            wb_robot_cleanup();
+        }
+
+        bool isRunning(void)
+        {
+            return wb_robot_step((int)_timestep) != -1;
+        }
+
+        void setMotors(
+                const float m1, 
+                const float m2, 
+                const float m3, 
+                const float m4)
+        {
+            wb_motor_set_velocity(_m1_motor, +m1);
+            wb_motor_set_velocity(_m2_motor, -m2);
+            wb_motor_set_velocity(_m3_motor, +m3);
+            wb_motor_set_velocity(_m4_motor, -m4);
+        }
+
+        void readSticks(
+                float & throttle, float & roll, float & pitch, float & yaw)
+        {
+            auto joystickStatus = haveJoystick();
+
+            throttle = 0;
+            roll = 0;
+            pitch = 0;
+            yaw = 0;
+
+            if (joystickStatus == JOYSTICK_RECOGNIZED) {
+                readJoystick(throttle, roll, pitch, yaw);
+            }
+
+            else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+                reportJoystick();
+            }
+
+            else {
+                readKeyboard(throttle, roll, pitch, yaw);
+            }
+        }
+
+        void close(void)
         {
             wb_robot_cleanup();
         }
@@ -73,15 +136,6 @@ class Quadcopter {
             return true;
         }
 
-        void setMotors(
-                const float m1, const float m2, const float m3, const float m4)
-        {
-            wb_motor_set_velocity(_m1_motor, +m1);
-            wb_motor_set_velocity(_m2_motor, -m2);
-            wb_motor_set_velocity(_m3_motor, +m3);
-            wb_motor_set_velocity(_m4_motor, -m4);
-        }
-
         void getVehicleState(state_t & state)
         {
             // Track previous time and position for calculating motion
@@ -99,15 +153,20 @@ class Quadcopter {
 
             // Get state variables, negating gyro for nose-right positive
             state.z  = wb_gps_get_values(_gps)[2];
-            state.phi = 
-                Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
-            state.dphi = 
-                Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[0]);
-            state.theta = 
-                Utils::RAD2DEG*(wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+
+            state.phi = Utils::RAD2DEG*(
+                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
+
+            state.dphi = Utils::RAD2DEG*(
+                    wb_gyro_get_values(_gyro)[0]);
+
+            state.theta = Utils::RAD2DEG*(
+                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
 
             state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
+
             state.psi  =  -Utils::RAD2DEG*(psi); 
+
             state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
 
             // Use temporal first difference to get world-cooredinate velocities
@@ -165,30 +224,7 @@ class Quadcopter {
             return sensor;
         }
 
-        void readSticks(
-                float & throttle, float & roll, float & pitch, float & yaw)
-        {
-            auto joystickStatus = haveJoystick();
-
-            throttle = 0;
-            roll = 0;
-            pitch = 0;
-            yaw = 0;
-
-            if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                readJoystick(throttle, roll, pitch, yaw);
-            }
-
-            else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                reportJoystick();
-            }
-
-            else {
-                readKeyboard(throttle, roll, pitch, yaw);
-            }
-        }
-
-        typedef struct {
+       typedef struct {
 
             int8_t throttle;
             int8_t roll;
