@@ -6,8 +6,8 @@
 class YawRateController {
 
     /*
-       Demand is input in degrees per second and output in units appropriate for our motors,
-       both nose-right positive.
+       Demand is input in degrees per second and output in units appropriate
+       for our motors, both nose-right positive.
      */
 
     public:

@@ -24,38 +24,27 @@ module Position where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Pid
 import Demands
 import State
 import Utils
 
-run kp ki dt ilimit target actual integ = (demand, integ') where
+run kp dt target actual = demand where
 
   error = target - actual
 
-  demand = kp * error + ki * integ
-
-  integ' = constrain (integ + error * dt) (-ilimit) (ilimit)
+  demand = kp * error
 
 {--
   Demand is input as desired speed in meter per second, output as
   angles in degrees.
 --}
 
-positionPid dt state demands = demands'  where
+positionController dt state demands = demands'  where
 
   kp = 25
-  ki = 1
-  ilimit = 5000
     
-  (rollDemand, rollInteg) = 
-    run kp ki dt ilimit (roll demands) (dy state) rollInteg'
+  rollDemand = run kp dt (roll demands) (dy state)
 
-  rollInteg' = [0] ++ rollInteg
-
-  (pitchDemand, pitchInteg) = 
-    run kp ki dt ilimit (pitch demands) (dx state) pitchInteg'
-
-  pitchInteg' = [0] ++ pitchInteg
+  pitchDemand = run kp dt (pitch demands) (dx state)
 
   demands' = Demands (thrust demands) rollDemand pitchDemand (yaw demands)

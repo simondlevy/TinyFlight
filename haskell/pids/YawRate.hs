@@ -24,7 +24,6 @@ module YawRate where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Pid
 import Demands
 import State
 import Utils
@@ -34,14 +33,13 @@ import Utils
    for our motors, both nose-right positive.
 --}
 
-yawRatePid dt state demands = demands' where
+yawRateController dt state demands = demands' where
 
-    kp = 120
-    ki = 16.7
-    ilimit = 166.7
+    kp = 1.20e-2
 
-    (yaw', integ) = piController kp ki dt ilimit (yaw demands) (dpsi state) integ'
+    error = (yaw demands) - (dpsi state)
+
+    yaw' = kp * error
 
     demands' = Demands (thrust demands) (roll demands) (pitch demands) yaw'
 
-    integ' = [0] ++ integ

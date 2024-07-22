@@ -16,7 +16,6 @@ class CoreTask {
 
     public:
 
-
         void init(
                 const float pitch_roll_angle_kp, 
                 const float pitch_roll_rate_kp, 

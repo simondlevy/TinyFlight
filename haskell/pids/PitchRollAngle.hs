@@ -25,40 +25,28 @@ module PitchRollAngle where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Pid
 import Demands
 import State
 import Utils
 
-run kp ki ilimit dt target actual integ = (demand, integ') where
+run kp dt target actual = demand where
 
     error = target - actual
 
-    demand = kp * error + ki * integ
-
-    integ' = constrain (integ + error * dt) (-ilimit) ilimit
+    demand = kp * error
 
 {--
   Demand is input as angles in degrees and output as angular velocities
   in degrees per second; roll-right / pitch-forward positive.
 --}
 
-pitchRollAnglePid dt state demands = demands' where
+pitchRollAngleController dt state demands = demands' where
 
   kp = 6
-  ki = 3
-  ilimit = 20
 
-  (rollDemand, rollInteg) = 
-    run kp ki ilimit dt (roll demands) (phi state) rollInteg'
+  rollDemand = run kp dt (roll demands) (phi state)
 
-  (pitchDemand, pitchInteg) = 
-    -- run kp ki ilimit dt (-(pitch demands)) (-(theta state)) pitchInteg'
-    run kp ki ilimit dt (pitch demands) (theta state) pitchInteg'
-
-  rollInteg' = [0] ++ rollInteg
-
-  pitchInteg' = [0] ++ pitchInteg
+  pitchDemand = run kp dt (pitch demands) (theta state)
 
   demands' = Demands (thrust demands) rollDemand pitchDemand (yaw demands)
 

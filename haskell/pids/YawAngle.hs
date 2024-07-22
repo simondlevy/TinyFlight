@@ -24,7 +24,6 @@ module YawAngle where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Pid
 import Demands
 import State
 import Utils
@@ -40,14 +39,12 @@ cap angle = angle''
 -- Demand is input as desired angle normalized to [-1,+1] and output
 -- as degrees per second, both nose-right positive.
 
-yawAnglePid dt state demands = demands'
+yawAngleController dt state demands = demands'
 
     where 
 
       kp = 6
-      ki = 1
       kd = 0.25
-      ilimit = 360
       angle_max = 200
 
       -- Yaw angle psi is positive nose-left, whereas yaw demand is
@@ -55,15 +52,17 @@ yawAnglePid dt state demands = demands'
       -- accumulate the angle target.  
       target = cap $ target' + angle_max * (yaw demands) * dt
 
-      (yaw', error, integ) =
-        pidController kp ki kd dt ilimit target (psi state) cap error' integ'
+      error = target - (psi state)
+
+      error' = [0] ++ error
+
+      deriv = (error - error') / dt
+
+      yaw' = kp * error + kd * deriv
 
       -- Return the result negated, so demand will still be nose-right
       -- positive
-      demands' = Demands (thrust demands) (roll demands) (pitch demands) (yaw')
+      demands' = Demands (thrust demands) (roll demands) (pitch demands) yaw'
 
       -- Reset target on zero thrust
       target' = [0] ++ (if (thrust demands == 0) then (psi state) else target)
-
-      integ' = [0] ++ integ
-      error' = [0] ++ error

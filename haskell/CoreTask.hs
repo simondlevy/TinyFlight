@@ -52,6 +52,12 @@ demandsStruct = extern "stream_stickDemands" Nothing
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
+altitudeTarget :: SFloat
+altitudeTarget = extern "stream_altitudeTarget" Nothing
+
+landed :: SBool
+landed = extern "stream_landed" Nothing
+
 step = (motors, stickDemands) where
 
   state = liftState stateStruct
@@ -60,23 +66,21 @@ step = (motors, stickDemands) where
 
   dt = rateToPeriod clock_rate
 
-  pids = [positionPid dt,
-          pitchRollAnglePid dt,
-          pitchRollRatePid false dt,
-          altitudePid true dt,
-          climbRatePid true dt,
-          yawAnglePid dt,
-          yawRatePid dt]
+  pids = [positionController dt,
+          pitchRollAngleController dt,
+          pitchRollRateController landed dt,
+          altitudeController altitudeTarget dt,
+          climbRateController (not landed) dt,
+          yawAngleController dt,
+          yawRateController dt]
 
   demands' = foldl (
      \demand pid -> pid state demand) stickDemands pids
 
-  thrust'' = (thrust demands') * tscale + tbase
-
-  motors = runCF $ Demands thrust''
-                                ((roll demands') * prscale)
-                                ((pitch demands') * prscale)
-                                ((yaw demands') * yscale)
+  motors = runCF $ Demands (thrust demands')
+                           (roll demands') 
+                           (pitch demands')
+                           (yaw demands')
 
 ------------------------------------------------------------------------------
  
