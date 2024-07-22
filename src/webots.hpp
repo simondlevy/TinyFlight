@@ -62,7 +62,6 @@ class Quadcopter {
             _m2_motor = _makeMotor("m2_motor", -1);
             _m3_motor = _makeMotor("m3_motor", +1);
             _m4_motor = _makeMotor("m4_motor", -1);
-
         }
 
         ~Quadcopter(void)
@@ -127,10 +126,8 @@ class Quadcopter {
             const auto dt =  tcurr - tprev;
             tprev = tcurr;
 
-            // Get yaw angle in radians
             auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
-            // Get state variables, negating gyro for nose-right positive
             state.z  = wb_gps_get_values(_gps)[2];
 
             state.phi = Utils::RAD2DEG*(
@@ -195,30 +192,10 @@ class Quadcopter {
         WbDeviceTag _m3_motor;
         WbDeviceTag _m4_motor;
 
-        WbDeviceTag _gps;
         WbDeviceTag _camera;
+        WbDeviceTag _gps;
         WbDeviceTag _gyro;
         WbDeviceTag _imu;
-
-        static WbDeviceTag _makeMotor(const char * name, const float direction)
-        {
-            auto motor = wb_robot_get_device(name);
-
-            wb_motor_set_position(motor, INFINITY);
-            wb_motor_set_velocity(motor, direction);
-
-            return motor;
-        }
-
-        static WbDeviceTag _makeSensor(
-                const char * name, 
-                const uint32_t timestep,
-                void (*f)(WbDeviceTag tag, int sampling_period))
-        {
-            auto sensor = wb_robot_get_device(name);
-            f(sensor, timestep);
-            return sensor;
-        }
 
         // Handles bogus nonzero throttle stick values at startup
         bool ready;
@@ -295,11 +272,11 @@ class Quadcopter {
 
         // Special handling for throttle stick: 
         //
-        // 1. Check for Logitech Extreme Pro 3D on Windows; have to use buttons
-        // for throttle.
+        // 1. Check for Logitech Extreme Pro 3D on Windows; have to use
+        // buttons for throttle.
         //
-        // 2. Starting at low throttle (as we should) produces an initial stick
-        // value of zero.  So we check for this and adjust as needed.
+        // 2. Starting at low throttle (as we should) produces an initial
+        // stick value of zero.  So we check for this and adjust as needed.
         //
         static float readJoystickThrust(
                 const char * name, const joystickAxes_t axes)
@@ -333,7 +310,7 @@ class Quadcopter {
             throttle = ready ? throttle : 0;
         }
 
-        static void readKeyboard(
+       static void readKeyboard(
                 float & throttle, float & roll, float & pitch, float & yaw) 
         {
             switch (wb_keyboard_get_key()) {
@@ -414,5 +391,25 @@ class Quadcopter {
                 printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
             }
         }
-};
 
+        static WbDeviceTag _makeMotor(
+                const char * name, const float direction)
+        {
+            auto motor = wb_robot_get_device(name);
+
+            wb_motor_set_position(motor, INFINITY);
+            wb_motor_set_velocity(motor, direction);
+
+            return motor;
+        }
+
+        static WbDeviceTag _makeSensor(
+                const char * name, 
+                const uint32_t timestep,
+                void (*f)(WbDeviceTag tag, int sampling_period))
+        {
+            auto sensor = wb_robot_get_device(name);
+            f(sensor, timestep);
+            return sensor;
+        }
+};

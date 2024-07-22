@@ -46,22 +46,22 @@ class Quadcopter {
 
             _timestep = wb_robot_get_basic_time_step();
 
-            _imu = Quadcopter::makeSensor("inertial_unit", 
+            _imu = Quadcopter::_makeSensor("inertial_unit", 
                     _timestep, wb_inertial_unit_enable); 
-            _gyro = Quadcopter::makeSensor("gyro", 
+            _gyro = Quadcopter::_makeSensor("gyro", 
                     _timestep, wb_gyro_enable);
-            _gps = Quadcopter::makeSensor("gps", 
+            _gps = Quadcopter::_makeSensor("gps", 
                     _timestep, wb_gps_enable);
-            _camera = Quadcopter::makeSensor("camera", 
+            _camera = Quadcopter::_makeSensor("camera", 
                     _timestep, wb_camera_enable);
 
             wb_joystick_enable(_timestep);
             wb_keyboard_enable(_timestep);
 
-            _m1_motor = makeMotor("m1_motor", +1);
-            _m2_motor = makeMotor("m2_motor", -1);
-            _m3_motor = makeMotor("m3_motor", +1);
-            _m4_motor = makeMotor("m4_motor", -1);
+            _m1_motor = _makeMotor("m1_motor", +1);
+            _m2_motor = _makeMotor("m2_motor", -1);
+            _m3_motor = _makeMotor("m3_motor", +1);
+            _m4_motor = _makeMotor("m4_motor", -1);
         }
 
         ~Quadcopter(void)
@@ -126,7 +126,6 @@ class Quadcopter {
             const auto dt =  tcurr - tprev;
             tprev = tcurr;
 
-            // Get yaw angle in radians
             auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
             state.z = wb_gps_get_values(_gps)[2];
@@ -193,10 +192,10 @@ class Quadcopter {
         WbDeviceTag _m3_motor;
         WbDeviceTag _m4_motor;
 
+        WbDeviceTag _camera;
         WbDeviceTag _gps;
         WbDeviceTag _gyro;
         WbDeviceTag _imu;
-        WbDeviceTag _camera;
 
         // Handles bogus nonzero throttle stick values at startup
         bool ready;
@@ -393,7 +392,7 @@ class Quadcopter {
             }
         }
 
-        static WbDeviceTag makeMotor(
+        static WbDeviceTag _makeMotor(
                 const char * name, const float direction)
         {
             auto motor = wb_robot_get_device(name);
@@ -404,12 +403,7 @@ class Quadcopter {
             return motor;
         }
 
-        static float _rad2deg(const float rad)
-        {
-            return rad / M_PI * 180;
-        }
-
-        static WbDeviceTag makeSensor(
+        static WbDeviceTag _makeSensor(
                 const char * name, 
                 const uint32_t timestep,
                 void (*f)(WbDeviceTag tag, int sampling_period))
@@ -418,5 +412,4 @@ class Quadcopter {
             f(sensor, timestep);
             return sensor;
         }
-
 };
