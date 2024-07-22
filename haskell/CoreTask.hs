@@ -52,9 +52,6 @@ demandsStruct = extern "stream_stickDemands" Nothing
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
-inFlyingMode :: SBool
-inFlyingMode = extern "stream_inFlyingMode" Nothing
-
 resetPids :: SBool
 resetPids = extern "stream_resetPids" Nothing
 
@@ -69,16 +66,15 @@ step = (motors, stickDemands) where
   pids = [positionPid dt,
           pitchRollAnglePid dt,
           pitchRollRatePid resetPids dt,
-          altitudePid inFlyingMode dt,
-          climbRatePid inFlyingMode dt,
+          altitudePid true dt,
+          climbRatePid true dt,
           yawAnglePid dt,
           yawRatePid dt]
 
   demands' = foldl (
      \demand pid -> pid state demand) stickDemands pids
 
-  thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) 
-             else tmin
+  thrust'' = (thrust demands') * tscale + tbase
 
   motors = runCF $ Demands thrust''
                                 ((roll demands') * prscale)
