@@ -81,10 +81,9 @@ int main(int argc, char ** argv)
         _sim.getVehicleState(stream_vehicleState);
 
         // XXX
-        stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
         stream_vehicleState.theta *= -1;
         stream_vehicleState.dtheta *= -1;
-        stream_vehicleState.dy *= -1;
+        //stream_vehicleState.dy *= -1;
 
         // Integrate stick demand to get altitude target
         altitudeTarget = Utils::fconstrain(

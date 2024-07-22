@@ -29,7 +29,15 @@ import Demands
 import State
 import Utils
 
-run kp ki dt ilimit target actual integ = (demand, integ') where
+run_roll kp ki dt ilimit target actual integ = (demand, integ') where
+
+  error = target - actual
+
+  demand = kp * error + ki * integ
+
+  integ' = constrain (integ + error * dt) (-ilimit) (ilimit)
+
+run_pitch kp ki dt ilimit target actual integ = (demand, integ') where
 
   error = target - actual
 
@@ -49,12 +57,12 @@ positionPid dt state demands = demands'  where
   ilimit = 5000
     
   (rollDemand, rollInteg) = 
-    run kp ki dt ilimit (roll demands) (dy state) rollInteg'
+    run_roll kp ki dt ilimit (roll demands) (dy state) rollInteg'
 
   rollInteg' = [0] ++ rollInteg
 
   (pitchDemand, pitchInteg) = 
-    run kp ki dt ilimit (pitch demands) (dx state) pitchInteg'
+    run_pitch kp ki dt ilimit (pitch demands) (dx state) pitchInteg'
 
   pitchInteg' = [0] ++ pitchInteg
 

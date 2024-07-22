@@ -74,9 +74,11 @@ step = (motors, openLoopDemands) where
           yawAnglePid dt,
           yawRatePid dt]
 
-  demands' = foldl (\demand pid -> pid vehicleState demand) openLoopDemands pids
+  demands' = foldl (
+     \demand pid -> pid vehicleState demand) openLoopDemands pids
 
-  thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) else tmin
+  thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) 
+             else tmin
 
   motors = quadXMixer $ Demands thrust''
                                 ((roll demands') * prscale)
