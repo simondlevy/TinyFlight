@@ -69,7 +69,7 @@ pitchRollRatePid reset dt state demands = demands' where
   rollPrev' = [0] ++ rollPrev
 
   (pitchDemand, pitchInteg, pitchPrev) = 
-    run nothrust reset kp ki kd ilimit dt (-(pitch demands)) (-(dtheta state))
+    run nothrust reset kp ki kd ilimit dt (pitch demands) (dtheta state)
         pitchInteg' pitchPrev'
 
   pitchInteg' = [0] ++ pitchInteg

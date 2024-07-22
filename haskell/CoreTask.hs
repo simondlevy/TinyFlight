@@ -80,7 +80,7 @@ step = (motors, openLoopDemands) where
   thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) 
              else tmin
 
-  motors = quadXMixer $ Demands thrust''
+  motors = runCF $ Demands thrust''
                                 ((roll demands') * prscale)
                                 ((pitch demands') * prscale)
                                 ((yaw demands') * yscale)
