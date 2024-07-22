@@ -146,15 +146,16 @@ class Quadcopter {
 
             state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
 
-            // Use temporal first difference to get world-cooredinate velocities
+            // Use temporal first difference to get world-cooredinate
+            // velocities
             auto x = wb_gps_get_values(_gps)[0];
             auto y = wb_gps_get_values(_gps)[1];
             auto dx = (x - xprev) / dt;
             auto dy = (y - yprev) / dt;
             state.dz = (state.z - zprev) / dt;
 
-            // Rotate X,Y world velocities into body frame to simulate optical-flow
-            // sensor
+            // Rotate X,Y world velocities into body frame to simulate
+            // optical-flow sensor
             auto cospsi = cos(psi);
             auto sinpsi = sin(psi);
             state.dx = dx * cospsi + dy * sinpsi;

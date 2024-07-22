@@ -44,7 +44,7 @@ class Quadcopter {
         {
             wb_robot_init();
 
-            _timestep = (int)wb_robot_get_basic_time_step();
+            _timestep = wb_robot_get_basic_time_step();
 
             // Initialize sensors
             _imu = _makeSensor("inertial_unit",
@@ -169,7 +169,8 @@ class Quadcopter {
 
             state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
 
-            // Use temporal first difference to get world-cooredinate velocities
+            // Use temporal first difference to get world-cooredinate
+            // velocities
             auto x = wb_gps_get_values(_gps)[0];
             auto y = wb_gps_get_values(_gps)[1];
             auto dx = (x - xprev) / dt;
@@ -188,21 +189,37 @@ class Quadcopter {
             yprev = y;
             zprev = state.z;
         }
+
     private:
 
-        int _timestep;
+       typedef struct {
 
-        // Motors
+            int8_t throttle;
+            int8_t roll;
+            int8_t pitch;
+            int8_t yaw;
+
+        } joystickAxes_t;
+
+        typedef enum {
+
+            JOYSTICK_NONE,
+            JOYSTICK_UNRECOGNIZED,
+            JOYSTICK_RECOGNIZED
+
+        } joystickStatus_e;
+
+        double _timestep;
+
         WbDeviceTag _m1_motor;
         WbDeviceTag _m2_motor;
         WbDeviceTag _m3_motor;
         WbDeviceTag _m4_motor;
 
-        // Sensors
-        WbDeviceTag _imu;
         WbDeviceTag _gps;
-        WbDeviceTag _gyro;
         WbDeviceTag _camera;
+        WbDeviceTag _gyro;
+        WbDeviceTag _imu;
 
         static WbDeviceTag _makeMotor(const char * name, const float direction)
         {
@@ -223,23 +240,6 @@ class Quadcopter {
             f(sensor, timestep);
             return sensor;
         }
-
-       typedef struct {
-
-            int8_t throttle;
-            int8_t roll;
-            int8_t pitch;
-            int8_t yaw;
-
-        } joystickAxes_t;
-
-        typedef enum {
-
-            JOYSTICK_NONE,
-            JOYSTICK_UNRECOGNIZED,
-            JOYSTICK_RECOGNIZED
-
-        } joystickStatus_e;
 
         // Handles bogus nonzero throttle stick values at startup
         bool ready;
