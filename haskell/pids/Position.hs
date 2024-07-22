@@ -38,14 +38,8 @@ run kp ki dt ilimit target actual integ = (demand, integ') where
   integ' = constrain (integ + error * dt) (-ilimit) (ilimit)
 
 {--
-  Position controller converts meters per second to  degrees.
-
-  Demands are input as normalized interval [-1,+1] and output as angles in 
-  degrees:
-
-   roll:  input left positive => output negative
-
-   pitch: input forward positive => output negative
+  Demand is input as desired speed in meter per second, output as
+  angles in degrees.
 --}
 
 positionPid dt state demands = demands'  where

@@ -30,13 +30,13 @@ import Demands
 import State
 import Utils
 
-run reset kp ki ilimit dt target actual integ = (demand, integ') where
+run kp ki ilimit dt target actual integ = (demand, integ') where
 
     error = target - actual
 
     demand = kp * error + ki * integ
 
-    integ' = if reset then 0 else constrain (integ + error * dt) (-ilimit) ilimit
+    integ' = constrain (integ + error * dt) (-ilimit) ilimit
 
 {--
 
@@ -49,17 +49,17 @@ run reset kp ki ilimit dt target actual integ = (demand, integ') where
 
 --}
 
-pitchRollAnglePid reset dt state demands = demands' where
+pitchRollAnglePid dt state demands = demands' where
 
   kp = 6
   ki = 3
   ilimit = 20
 
   (rollDemand, rollInteg) = 
-    run reset kp ki ilimit dt (roll demands) (phi state) rollInteg'
+    run kp ki ilimit dt (roll demands) (phi state) rollInteg'
 
   (pitchDemand, pitchInteg) = 
-    run reset kp ki ilimit dt (pitch demands) (theta state) pitchInteg'
+    run kp ki ilimit dt (pitch demands) (theta state) pitchInteg'
 
   rollInteg' = [0] ++ rollInteg
 
