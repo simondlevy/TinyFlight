@@ -58,10 +58,10 @@ class Quadcopter {
             wb_joystick_enable(_timestep);
             wb_keyboard_enable(_timestep);
 
-            _motor1 = _makeMotor("m1_motor", +1);
-            _motor2 = _makeMotor("m2_motor", -1);
-            _motor3 = _makeMotor("m3_motor", +1);
-            _motor4 = _makeMotor("m4_motor", -1);
+            _motor1 = _makeMotor("motor1", +1);
+            _motor2 = _makeMotor("motor2", -1);
+            _motor3 = _makeMotor("motor3", +1);
+            _motor4 = _makeMotor("motor4", -1);
         }
 
         ~Quadcopter(void)
