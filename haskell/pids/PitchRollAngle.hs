@@ -53,7 +53,7 @@ pitchRollAnglePid dt state demands = demands' where
     run kp ki ilimit dt (roll demands) (phi state) rollInteg'
 
   (pitchDemand, pitchInteg) = 
-    run kp ki ilimit dt (pitch demands) (theta state) pitchInteg'
+    run kp ki ilimit dt (-(pitch demands)) (theta state) pitchInteg'
 
   rollInteg' = [0] ++ rollInteg
 

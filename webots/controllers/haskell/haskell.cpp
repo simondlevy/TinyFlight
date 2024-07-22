@@ -80,8 +80,6 @@ int main(int argc, char ** argv)
         // Get vehicle state from sensors
         _sim.getVehicleState(stream_vehicleState);
 
-        printf("%+3.3f\n", stream_stickDemands.pitch);
-
         // XXX
         stream_vehicleState.theta *= -1;
         stream_vehicleState.dtheta *= -1;
