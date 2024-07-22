@@ -17,6 +17,7 @@
  */
 
 #include <datatypes.h>
+#include <utils.hpp>
 #include <webots.hpp>
 
 // ----------------------------------------------------------------------------
@@ -28,8 +29,8 @@ static const float ALTITUDE_TARGET_MAX = 2.0;  // 3.0 in original
 
 static const float DT = .01;
 
+// Webots helper class
 static Quadcopter _sim;
-
 
 // These are global so they can be shared with Haskell Copilot ---------------
 
@@ -54,11 +55,6 @@ void setMotors(float m1, float m2, float m3, float m4)
 }
 
 // ---------------------------------------------------------------------------
-
-static float _constrain(const float val, const float lo, const float hi)
-{
-    return val < lo ? lo : val > hi ? hi : val;
-}
 
 int main(int argc, char ** argv)
 {
@@ -98,7 +94,7 @@ int main(int argc, char ** argv)
         stream_vehicleState.dy *= -1;
 
         // Integrate stick demand to get altitude target
-        altitudeTarget = _constrain(
+        altitudeTarget = Utils::fconstrain(
                 altitudeTarget + stream_openLoopDemands.thrust * DT, 
                 ALTITUDE_TARGET_MIN, ALTITUDE_TARGET_MAX);
 
