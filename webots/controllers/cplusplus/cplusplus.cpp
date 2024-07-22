@@ -30,19 +30,21 @@ int main(int argc, char ** argv)
             TMIN,
             DT);
 
-    Quadcopter quadcopter = {};
+    Quadcopter sim = {};
+
+    sim.init();
 
     state_t state = {};
 
     demands_t demands = {};
 
-    while (quadcopter.getStateAndDemands(state, demands)) {
+    while (sim.getStateAndDemands(state, demands)) {
 
         quad_motors_t motors = {};
 
         coreTask.run(state, demands, motors);
 
-        quadcopter.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
+        sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
     }
 
     return 0;

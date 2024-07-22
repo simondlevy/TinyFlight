@@ -40,7 +40,7 @@ class Quadcopter {
 
     public:
 
-        Quadcopter(void)
+        void init(void)
         {
             wb_robot_init();
 
