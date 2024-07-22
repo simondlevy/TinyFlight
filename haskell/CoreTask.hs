@@ -47,7 +47,7 @@ import YawRate
 -- Streams from C++ ----------------------------------------------------------
 
 demandsStruct :: Stream DemandsStruct
-demandsStruct = extern "stream_openLoopDemands" Nothing
+demandsStruct = extern "stream_stickDemands" Nothing
 
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing

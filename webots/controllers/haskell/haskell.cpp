@@ -34,7 +34,7 @@ static Quadcopter _sim;
 
 // These are global so they can be shared with Haskell Copilot ---------------
 
-demands_t stream_openLoopDemands;
+demands_t stream_stickDemands;
 
 state_t stream_vehicleState;
 
@@ -72,26 +72,27 @@ int main(int argc, char ** argv)
 
         // Get open-loop demands from input device (keyboard, joystick, etc.)
         _sim.readSticks(
-                stream_openLoopDemands.thrust,
-                stream_openLoopDemands.roll, 
-                stream_openLoopDemands.pitch, 
-                stream_openLoopDemands.yaw);
+                stream_stickDemands.thrust,
+                stream_stickDemands.roll, 
+                stream_stickDemands.pitch, 
+                stream_stickDemands.yaw);
 
         // Get vehicle state from sensors
         _sim.getVehicleState(stream_vehicleState);
 
+        printf("%+3.3f\n", stream_stickDemands.pitch);
+
         // XXX
         stream_vehicleState.theta *= -1;
         stream_vehicleState.dtheta *= -1;
-        //stream_vehicleState.dy *= -1;
 
         // Integrate stick demand to get altitude target
         altitudeTarget = Utils::fconstrain(
-                altitudeTarget + stream_openLoopDemands.thrust * DT, 
+                altitudeTarget + stream_stickDemands.thrust * DT, 
                 ALTITUDE_TARGET_MIN, ALTITUDE_TARGET_MAX);
 
         // Rescale altitude target to [-1,+1]
-        stream_openLoopDemands.thrust = 
+        stream_stickDemands.thrust = 
             2 * ((altitudeTarget - ALTITUDE_TARGET_MIN) /
                 (ALTITUDE_TARGET_MAX - ALTITUDE_TARGET_MIN)) - 1;
 
