@@ -38,7 +38,9 @@ int main(int argc, char ** argv)
 
     demands_t demands = {};
 
-    while (sim.getStateAndDemands(state, demands)) {
+    while (sim.isRunning()) {
+
+        sim.getStateAndDemands(state, demands);
 
         quad_motors_t motors = {};
 

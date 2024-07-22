@@ -116,12 +116,8 @@ class Quadcopter {
             wb_robot_cleanup();
         }
 
-        bool getStateAndDemands(state_t & state, demands_t & demands)
+        void getStateAndDemands(state_t & state, demands_t & demands)
         {
-            if (wb_robot_step(_timestep) == -1) {
-                return false;
-            }
-
             //Un-comment if you want to try OpenCV
             // runCamera(camera);
 
@@ -132,8 +128,6 @@ class Quadcopter {
 
             // Get vehicle state from sensors
             getVehicleState(state);
-
-            return true;
         }
 
         void getVehicleState(state_t & state)
