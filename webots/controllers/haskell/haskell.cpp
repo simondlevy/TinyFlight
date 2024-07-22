@@ -80,10 +80,6 @@ int main(int argc, char ** argv)
         // Get vehicle state from sensors
         _sim.getVehicleState(stream_vehicleState);
 
-        // XXX
-        //stream_vehicleState.theta *= -1;
-        stream_vehicleState.dtheta *= -1;
-
         // Integrate stick demand to get altitude target
         altitudeTarget = Utils::fconstrain(
                 altitudeTarget + stream_stickDemands.thrust * DT, 
