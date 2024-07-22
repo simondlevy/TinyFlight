@@ -66,7 +66,7 @@ class Quadcopter {
 
         ~Quadcopter(void)
         {
-            wb_robot_cleanup();
+            close();
         }
 
         bool isRunning(void)

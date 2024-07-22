@@ -46,7 +46,6 @@ class Quadcopter {
 
             _timestep = wb_robot_get_basic_time_step();
 
-            // Initialize sensors
             _imu = _makeSensor("inertial_unit",
                     _timestep, wb_inertial_unit_enable);
             _gyro = _makeSensor("gyro",
@@ -68,7 +67,7 @@ class Quadcopter {
 
         ~Quadcopter(void)
         {
-            wb_robot_cleanup();
+            close();
         }
 
         bool isRunning(void)
@@ -114,20 +113,6 @@ class Quadcopter {
         void close(void)
         {
             wb_robot_cleanup();
-        }
-
-        void getStateAndDemands(state_t & state, demands_t & demands)
-        {
-            //Un-comment if you want to try OpenCV
-            // runCamera(camera);
-
-            // Get open-loop demands from input device (keyboard, joystick,
-            // etc.)
-            readSticks(
-                    demands.thrust, demands.roll, demands.pitch, demands.yaw);
-
-            // Get vehicle state from sensors
-            getVehicleState(state);
         }
 
         void getVehicleState(state_t & state)
