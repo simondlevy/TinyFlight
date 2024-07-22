@@ -40,7 +40,13 @@ int main(int argc, char ** argv)
 
     while (sim.isRunning()) {
 
-        sim.getStateAndDemands(state, demands);
+        sim.readSticks(
+                demands.thrust,
+                demands.roll,
+                demands.pitch,
+                demands.yaw);
+
+        sim.getVehicleState(state);
 
         quad_motors_t motors = {};
 
