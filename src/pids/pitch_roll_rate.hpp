@@ -7,8 +7,8 @@
 class PitchRollRateController {
 
     /*
-       Demands are input as angular velocities in degrees per second and output 
-       in uints appropriate for our motors.
+       Demands are input as angular velocities in degrees per second and
+       output in uints appropriate for our motors.
      */
 
     public:

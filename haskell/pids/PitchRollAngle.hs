@@ -39,14 +39,8 @@ run kp ki ilimit dt target actual integ = (demand, integ') where
     integ' = constrain (integ + error * dt) (-ilimit) ilimit
 
 {--
-
-  Demand is input as angles in degrees and output as angular velocities in
-  degrees per second:
-
-  roll: right-down positive
-
-  pitch: nose-up positive
-
+  Demand is input as angles in degrees and output as angular velocities
+  in degrees per second; roll-right / pitch-forward positive.
 --}
 
 pitchRollAnglePid dt state demands = demands' where

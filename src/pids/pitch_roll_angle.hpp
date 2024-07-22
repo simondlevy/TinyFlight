@@ -7,8 +7,8 @@
 class PitchRollAngleController {
 
     /*
-       Demand is input as angles in degrees and output as angular velocities in
-       degrees per second; roll-right / pitch-forward positive.
+       Demand is input as angles in degrees and output as angular velocities
+       in degrees per second; roll-right / pitch-forward positive.
      */
 
     public:

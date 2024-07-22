@@ -97,14 +97,14 @@ int main(int argc, char ** argv)
                 ALTITUDE_TARGET_MIN, ALTITUDE_TARGET_MAX);
 
         // Rescale altitude target to [-1,+1]
-        stream_openLoopDemands.thrust = 2 * ((altitudeTarget - ALTITUDE_TARGET_MIN) /
+        stream_openLoopDemands.thrust = 
+            2 * ((altitudeTarget - ALTITUDE_TARGET_MIN) /
                 (ALTITUDE_TARGET_MAX - ALTITUDE_TARGET_MIN)) - 1;
 
        copilot_step_core();
     }
 
     _sim.close();
-
 
     return 0;
 }

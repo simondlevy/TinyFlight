@@ -47,14 +47,8 @@ run nothrust reset kp ki kd ilimit dt target actual integ prev =
             else error
 
 {--
-
-  Demands are input as angular velocities in degrees per second and output as
-  as arbitrary values to be scaled according to motor characteristics:
-
-  roll:  input roll-right positive => output positive
-
-  pitch: input nose-up positive => output positive
-
+  Demands are input as angular velocities in degrees per second and
+  output in uints appropriate for our motors.
 --}
 
 pitchRollRatePid reset dt state demands = demands' where

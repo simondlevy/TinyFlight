@@ -58,10 +58,10 @@ class Quadcopter {
             wb_joystick_enable(_timestep);
             wb_keyboard_enable(_timestep);
 
-            _m1_motor = _makeMotor("m1_motor", +1);
-            _m2_motor = _makeMotor("m2_motor", -1);
-            _m3_motor = _makeMotor("m3_motor", +1);
-            _m4_motor = _makeMotor("m4_motor", -1);
+            _motor1 = _makeMotor("m1_motor", +1);
+            _motor2 = _makeMotor("m2_motor", -1);
+            _motor3 = _makeMotor("m3_motor", +1);
+            _motor4 = _makeMotor("m4_motor", -1);
         }
 
         ~Quadcopter(void)
@@ -80,10 +80,10 @@ class Quadcopter {
                 const float m3, 
                 const float m4)
         {
-            wb_motor_set_velocity(_m1_motor, +m1);
-            wb_motor_set_velocity(_m2_motor, -m2);
-            wb_motor_set_velocity(_m3_motor, +m3);
-            wb_motor_set_velocity(_m4_motor, -m4);
+            wb_motor_set_velocity(_motor1, +m1);
+            wb_motor_set_velocity(_motor2, -m2);
+            wb_motor_set_velocity(_motor3, +m3);
+            wb_motor_set_velocity(_motor4, -m4);
         }
 
         void readSticks(
@@ -187,10 +187,10 @@ class Quadcopter {
 
         double _timestep;
 
-        WbDeviceTag _m1_motor;
-        WbDeviceTag _m2_motor;
-        WbDeviceTag _m3_motor;
-        WbDeviceTag _m4_motor;
+        WbDeviceTag _motor1;
+        WbDeviceTag _motor2;
+        WbDeviceTag _motor3;
+        WbDeviceTag _motor4;
 
         WbDeviceTag _camera;
         WbDeviceTag _gps;
