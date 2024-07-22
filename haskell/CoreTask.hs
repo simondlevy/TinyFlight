@@ -66,7 +66,7 @@ step = (motors, openLoopDemands) where
 
   dt = rateToPeriod clock_rate
 
-  pids = [positionPid resetPids dt,
+  pids = [positionPid dt,
           pitchRollAnglePid resetPids dt,
           pitchRollRatePid resetPids dt,
           altitudePid inFlyingMode dt,
