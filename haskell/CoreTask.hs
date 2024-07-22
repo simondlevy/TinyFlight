@@ -58,11 +58,11 @@ inFlyingMode = extern "stream_inFlyingMode" Nothing
 resetPids :: SBool
 resetPids = extern "stream_resetPids" Nothing
 
-step = (motors, openLoopDemands) where
+step = (motors, stickDemands) where
 
-  vehicleState = liftState stateStruct
+  state = liftState stateStruct
 
-  openLoopDemands = liftDemands demandsStruct
+  stickDemands = liftDemands demandsStruct
 
   dt = rateToPeriod clock_rate
 
@@ -75,7 +75,7 @@ step = (motors, openLoopDemands) where
           yawRatePid dt]
 
   demands' = foldl (
-     \demand pid -> pid vehicleState demand) openLoopDemands pids
+     \demand pid -> pid state demand) stickDemands pids
 
   thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) 
              else tmin
@@ -91,9 +91,9 @@ spec = do
 
     let (motors, demands) = step
 
-    let (me_ne, m_se, m_sw, m_nw) = motors
+    let (m1, m2, m3, m4) = motors
 
-    trigger "setMotors" true [arg $ me_ne, arg $ m_se, arg $ m_sw, arg $ m_nw] 
+    trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
 
 -- Compile the spec
 main = reify spec >>= 
