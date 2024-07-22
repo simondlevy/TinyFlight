@@ -222,6 +222,8 @@
 <text x="35.2074" y="41.3258" size="1.016" layer="26" rot="MR0">RX</text>
 <text x="22.4958" y="38.5188" size="1.016" layer="26" rot="MR180">3V3</text>
 <text x="22.5252" y="35.9358" size="1.016" layer="26" rot="MR180">GD</text>
+<text x="51.072" y="41.1806" size="1.016" layer="25">CS</text>
+<text x="48.786" y="41.1806" size="1.016" layer="25">SO</text>
 </plain>
 <libraries>
 <library name="TEENSY 4.0">
