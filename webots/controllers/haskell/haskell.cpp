@@ -77,13 +77,11 @@ int main(int argc, char ** argv)
                 stream_openLoopDemands.pitch, 
                 stream_openLoopDemands.yaw);
 
-        // Adjust roll for positive leftward
-        stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
-
         // Get vehicle state from sensors
         _sim.getVehicleState(stream_vehicleState);
 
         // XXX
+        stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
         stream_vehicleState.theta *= -1;
         stream_vehicleState.dtheta *= -1;
         stream_vehicleState.dy *= -1;
