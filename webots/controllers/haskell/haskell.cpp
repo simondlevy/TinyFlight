@@ -38,8 +38,6 @@ demands_t stream_stickDemands;
 
 state_t stream_vehicleState;
 
-bool stream_resetPids;
-
 void report(float value)
 {
     printf("%f\n", value);
@@ -59,8 +57,6 @@ int main(int argc, char ** argv)
     _sim.init();
 
     float altitudeTarget = ALTITUDE_TARGET_INITIAL;
-
-    stream_resetPids = false;
 
     while (_sim.isRunning()) {
 

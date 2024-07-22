@@ -52,9 +52,6 @@ demandsStruct = extern "stream_stickDemands" Nothing
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
-resetPids :: SBool
-resetPids = extern "stream_resetPids" Nothing
-
 step = (motors, stickDemands) where
 
   state = liftState stateStruct
@@ -65,7 +62,7 @@ step = (motors, stickDemands) where
 
   pids = [positionPid dt,
           pitchRollAnglePid dt,
-          pitchRollRatePid resetPids dt,
+          pitchRollRatePid false dt,
           altitudePid true dt,
           climbRatePid true dt,
           yawAnglePid dt,
