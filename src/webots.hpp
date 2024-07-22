@@ -128,7 +128,7 @@ class Quadcopter {
 
             auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
-            state.z  = wb_gps_get_values(_gps)[2];
+            state.z = wb_gps_get_values(_gps)[2];
 
             state.phi = Utils::RAD2DEG*(
                     wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
@@ -168,7 +168,7 @@ class Quadcopter {
 
     private:
 
-       typedef struct {
+        typedef struct {
 
             int8_t throttle;
             int8_t roll;
@@ -310,7 +310,7 @@ class Quadcopter {
             throttle = ready ? throttle : 0;
         }
 
-       static void readKeyboard(
+        static void readKeyboard(
                 float & throttle, float & roll, float & pitch, float & yaw) 
         {
             switch (wb_keyboard_get_key()) {

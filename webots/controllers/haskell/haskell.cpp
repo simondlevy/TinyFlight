@@ -17,7 +17,7 @@
  */
 
 #include <datatypes.h>
-#include <hwebots.hpp>
+#include <webots.hpp>
 
 // ----------------------------------------------------------------------------
 
@@ -95,6 +95,7 @@ int main(int argc, char ** argv)
         stream_vehicleState.dtheta *= -1;
         stream_vehicleState.psi *= -1;
         stream_vehicleState.dpsi *= -1;
+        stream_vehicleState.dy *= -1;
 
         // Integrate stick demand to get altitude target
         altitudeTarget = _constrain(
