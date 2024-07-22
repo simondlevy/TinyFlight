@@ -71,14 +71,11 @@ int main(int argc, char ** argv)
         // runCamera(camera);
 
         // Get open-loop demands from input device (keyboard, joystick, etc.)
-        float throttle = 0;
         _sim.readSticks(
-                throttle,
+                stream_openLoopDemands.thrust,
                 stream_openLoopDemands.roll, 
                 stream_openLoopDemands.pitch, 
                 stream_openLoopDemands.yaw);
-
-        stream_openLoopDemands.thrust = throttle;
 
         // Adjust roll for positive leftward
         stream_openLoopDemands.roll = -stream_openLoopDemands.roll;
