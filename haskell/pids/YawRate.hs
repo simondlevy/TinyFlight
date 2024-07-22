@@ -29,11 +29,10 @@ import Demands
 import State
 import Utils
 
--- Yaw demand is nose-right positive, whereas yaw angle psi and its first
--- derivative (angular velocity) dspi are nose-right negative.
--- Hence we negate yaw demand, run the PID closedloop on the
--- negated demand and the angular velocity, and negate the result to get the
--- correct yaw demand.
+{--
+   Demand is input in degrees per second and output in units appropriate
+   for our motors, both nose-right positive.
+--}
 
 yawRatePid dt state demands = demands' where
 
@@ -41,11 +40,8 @@ yawRatePid dt state demands = demands' where
     ki = 16.7
     ilimit = 166.7
 
-    (yaw', integ) = piController kp ki dt ilimit (-(yaw demands)) (dpsi state) integ'
+    (yaw', integ) = piController kp ki dt ilimit (yaw demands) (dpsi state) integ'
 
-    -- No yaw demand on zero thrust
-    yaw'' = if (thrust demands) == 0 then 0 else yaw'
-
-    demands' = Demands (thrust demands) (roll demands) (pitch demands) (-yaw'')
+    demands' = Demands (thrust demands) (roll demands) (pitch demands) yaw'
 
     integ' = [0] ++ integ
