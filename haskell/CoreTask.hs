@@ -63,12 +63,6 @@ demandsStruct = extern "stream_stickDemands" Nothing
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
-altitudeTarget :: SFloat
-altitudeTarget = extern "stream_altitudeTarget" Nothing
-
-landed :: SBool
-landed = extern "stream_landed" Nothing
-
 step = motors where
 
   state = liftState stateStruct
@@ -93,12 +87,13 @@ step = motors where
 
   status' = [0] ++ status
 
+  landed = status == status_landed
+
   dt = rateToPeriod clock_rate
 
   pids = [positionController dt,
           pitchRollAngleController dt,
           pitchRollRateController dt,
-          -- altitudeController altitudeTarget dt,
           altitudeController altitude_target dt,
           climbRateController (not landed) dt,
           yawAngleController dt,

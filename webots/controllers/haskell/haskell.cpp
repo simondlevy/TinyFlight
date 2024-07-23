@@ -22,10 +22,6 @@
 
 // ----------------------------------------------------------------------------
 
-static const float ALTITUDE_TARGET_INITIAL = 0.2;
-
-static const float DT = .01;
-
 // Webots helper class
 static Quadcopter _sim;
 
@@ -34,10 +30,6 @@ static Quadcopter _sim;
 demands_t stream_stickDemands;
 
 state_t stream_vehicleState;
-
-float stream_altitudeTarget;
-
-bool stream_landed;
 
 void debug(float value)
 {
@@ -65,14 +57,6 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    stream_altitudeTarget = 0;
-
-    uint8_t status = STATUS_LANDED;
-
-    static const float THROTTLE_ZERO = 0.05;
-    static const float THROTTLE_SCALE = 0.005;
-    static const float ZGROUND = 0.05;
-
     while (_sim.isRunning()) {
 
         // Get open-loop demands from input device (keyboard, joystick, etc.)
@@ -84,30 +68,6 @@ int main(int argc, char ** argv)
 
         // Get vehicle state from sensors
         _sim.getVehicleState(stream_vehicleState);
-
-        stream_altitudeTarget =
-            status == STATUS_FLYING ? 
-            stream_altitudeTarget + THROTTLE_SCALE *
-              stream_stickDemands.thrust :
-            status == STATUS_LANDED ?
-            ALTITUDE_TARGET_INITIAL :
-            stream_altitudeTarget;
-
-        status = 
-
-            status == STATUS_TAKING_OFF  && stream_vehicleState.z > ZGROUND ?  
-            STATUS_FLYING :
-
-            status == STATUS_FLYING && stream_vehicleState.z <= ZGROUND ?  
-            STATUS_LANDED :
-
-            status == STATUS_LANDED && 
-            stream_stickDemands.thrust > THROTTLE_ZERO ? 
-            STATUS_TAKING_OFF :
-
-            status;
-
-        stream_landed = status == STATUS_LANDED;
 
         copilot_step_core();
     }
