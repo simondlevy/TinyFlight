@@ -58,7 +58,7 @@ altitudeTarget = extern "stream_altitudeTarget" Nothing
 landed :: SBool
 landed = extern "stream_landed" Nothing
 
-step = (motors, stickDemands) where
+step = (motors, ydemand) where
 
   state = liftState stateStruct
 
@@ -66,31 +66,39 @@ step = (motors, stickDemands) where
 
   dt = rateToPeriod clock_rate
 
-  pids = [positionController dt,
-          pitchRollAngleController dt,
+  demands = positionController dt state stickDemands
+
+  ydemand = roll demands
+
+  demands' = pitchRollAngleController dt state demands
+
+  pids = [ -- positionController dt,
+          -- pitchRollAngleController dt,
           pitchRollRateController landed dt,
           altitudeController altitudeTarget dt,
           climbRateController (not landed) dt,
           yawAngleController dt,
           yawRateController dt]
 
-  demands' = foldl (
-     \demand pid -> pid state demand) stickDemands pids
+  demands'' = foldl (
+     \demand pid -> pid state demand) demands' pids
 
-  motors = runCF $ Demands (thrust demands')
-                           (roll demands') 
-                           (pitch demands')
-                           (yaw demands')
+  motors = runCF $ Demands (thrust demands'')
+                           (roll demands'') 
+                           (pitch demands'')
+                           (yaw demands'')
 
 ------------------------------------------------------------------------------
  
 spec = do
 
-    let (motors, demands) = step
+    let (motors, ydemand) = step
 
     let (m1, m2, m3, m4) = motors
 
     trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
+
+    trigger "debug" true [arg ydemand]
 
 -- Compile the spec
 main = reify spec >>= 

@@ -42,9 +42,9 @@ float stream_altitudeTarget;
 
 bool stream_landed;
 
-void report(float value)
+void debug(float value)
 {
-    printf("%f\n", value);
+    printf("%+3.3f\n", value);
 }
 
 void copilot_step_core(void);
