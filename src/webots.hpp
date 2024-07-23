@@ -37,7 +37,7 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
-class Quadcopter {
+class Simulator {
 
     public:
 

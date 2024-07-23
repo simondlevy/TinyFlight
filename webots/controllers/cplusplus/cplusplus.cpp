@@ -30,7 +30,7 @@ int main(int argc, char ** argv)
             TMIN,
             DT);
 
-    Quadcopter sim = {};
+    Simulator sim = {};
 
     sim.init();
 

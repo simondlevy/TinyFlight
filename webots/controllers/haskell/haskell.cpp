@@ -21,8 +21,8 @@
 
 // ----------------------------------------------------------------------------
 
-// Webots helper class
-static Quadcopter _sim;
+// Webots simulator class
+static Simulator _sim;
 
 // Global data and routines shared with Haskell Copilot ----------------------
 
@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
         copilot_step_core();
     }
 
-    sim.close();
+    _sim.close();
 
     return 0;
 }
