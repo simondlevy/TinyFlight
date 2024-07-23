@@ -24,21 +24,11 @@ module ClimbRate where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Constants
 import Pid
 import Demands
 import State
 import Utils
-
-run dt thrust dz = thrust'  where
-
-    kp = 25
-    ki = 15
-    ilimit = 5000
-
-    (thrust', integ) = piController kp ki dt ilimit thrust dz integ'
-
-    integ' = [0] ++ integ
-
 
 {-- 
 
@@ -47,10 +37,17 @@ run dt thrust dz = thrust'  where
 
 --}
 
-climbRatePid flying dt state demands = demands' where
+climbRateController flying dt state demands = demands' where
 
-    thrustraw = thrust demands
+    kp = 25
+    ki = 15
+    ilimit = 5000
 
-    thrustout = if flying then run dt thrustraw (dz state) else thrustraw
+    (thrustpid, integ) =
+      piController kp ki dt ilimit (thrust demands) (dz state) integ'
+
+    integ' = [0] ++ integ
+
+    thrustout = if flying then thrustpid * tscale + tbase else tmin
 
     demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)

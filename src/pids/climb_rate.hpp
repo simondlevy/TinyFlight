@@ -22,7 +22,7 @@ class ClimbRateController {
                 demands_t & demands)
         {
             const auto thrustpid = _pid.run_pi(
-                    KP, KI, ILIMIT, dt, demands.thrust, state.dpos.z);
+                    KP, KI, ILIMIT, dt, demands.thrust, state.dz);
 
             demands.thrust = flying ? thrustpid * tscale + tbase : tmin;
         }

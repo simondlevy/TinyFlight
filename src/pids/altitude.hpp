@@ -22,7 +22,7 @@ class AltitudeController {
                 demands_t & demands)
         {
 
-            demands.thrust = _pid.run_pi(KP, KI, ILIMIT, dt, target, state.pos.z);
+            demands.thrust = _pid.run_pi(KP, KI, ILIMIT, dt, target, state.z);
         }
 
     private:

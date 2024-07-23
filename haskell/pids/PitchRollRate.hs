@@ -29,56 +29,38 @@ import Demands
 import State
 import Utils
 
-run nothrust reset kp ki kd ilimit dt target actual integ prev =
-  (demand, integ', prev') where
+run nothrust reset kp kd dt target actual prev =
+  (demand, prev') where
 
     error = target - actual
 
     demand = if nothrust 
              then 0 else 
-             kp * error + ki * integ + kd * (error - prev) / dt
-
-    integ' = if reset then 0 
-             else if nothrust then integ
-             else constrain (integ + error * dt) (-ilimit) ilimit
+             kp * error + kd * (error - prev) / dt
 
     prev' = if reset then 0 
             else if nothrust then prev
             else error
 
 {--
-
-  Demands are input as angular velocities in degrees per second and output as
-  as arbitrary values to be scaled according to motor characteristics:
-
-  roll:  input roll-right positive => output positive
-
-  pitch: input nose-up positive => output positive
-
+  Demands are input as angular velocities in degrees per second and
+  output in uints appropriate for our motors.
 --}
 
-pitchRollRatePid reset dt state demands = demands' where
+pitchRollRateController reset dt state demands = demands' where
 
-  kp = 125
-  ki = 250
-  kd = 1.25
-  ilimit = 33
+  kp = 1.25e-2
+  kd = 1.25e-4
 
   nothrust = (thrust demands) == 0
 
-  (rollDemand, rollInteg, rollPrev) = 
-    run nothrust reset kp ki kd ilimit dt (roll demands) (dphi state)
-        rollInteg' rollPrev'
-
-  rollInteg' = [0] ++ rollInteg
+  (rollDemand, rollPrev) = 
+    run nothrust reset kp kd dt (roll demands) (dphi state) rollPrev'
 
   rollPrev' = [0] ++ rollPrev
 
-  (pitchDemand, pitchInteg, pitchPrev) = 
-    run nothrust reset kp ki kd ilimit dt (pitch demands) (dtheta state) 
-        pitchInteg' pitchPrev'
-
-  pitchInteg' = [0] ++ pitchInteg
+  (pitchDemand, pitchPrev) = 
+    run nothrust reset kp kd dt (pitch demands) (dtheta state) pitchPrev'
 
   pitchPrev' = [0] ++ pitchPrev
 

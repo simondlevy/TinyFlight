@@ -6,8 +6,8 @@
 class YawRateController {
 
     /*
-       Demand is input in degrees per second and output in units appropriate for our motors,
-       both nose-right positive.
+       Demand is input in degrees per second and output in units appropriate
+       for our motors, both nose-right positive.
      */
 
     public:
@@ -19,7 +19,7 @@ class YawRateController {
                 demands_t & demands)
         {
             demands.yaw =
-                _pid.run_p(kp, dt, demands.yaw, state.dang.z);
+                _pid.run_p(kp, dt, demands.yaw, state.dpsi);
         }
 
     private:

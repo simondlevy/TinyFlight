@@ -28,7 +28,3 @@ tbase = 56 :: SFloat
 tscale = 0.25 :: SFloat
 
 tmin = 0 :: SFloat
-
-prscale = 1e-4 :: SFloat
-
-yscale = 4e-5 :: SFloat

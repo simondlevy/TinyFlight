@@ -22,10 +22,10 @@ class YawAngleController {
 
             const auto target = cap (_target + ANGLE_MAX * demands.yaw * dt);
 
-            demands.yaw = _pid.run_pd(KP, KD, dt, target, state.ang.z);
+            demands.yaw = _pid.run_pd(KP, KD, dt, target, state.psi);
 
             // Reset target on zero thrust
-            _target =  demands.thrust == 0 ? state.ang.z : target;
+            _target =  demands.thrust == 0 ? state.psi : target;
         }
 
     private:

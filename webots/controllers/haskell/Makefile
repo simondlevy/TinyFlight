@@ -1,7 +1,7 @@
 CFLAGS = -Wno-unused-variable
 
 # Needed for datatypes.h
-CPPDIR = ../../../crazyflie/src
+CPPDIR = ../../../src
 INCLUDE = -I$(CPPDIR)
 
 HASKDIR = ../../../haskell
@@ -13,8 +13,7 @@ FILES_TO_REMOVE += copilot*
 all: haskell
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
-	# runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Core.hs
-	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Crazyflie.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/CoreTask.hs
 	mv copilot_core.c copilot_core.cpp
 
 size: copilot_core.cpp

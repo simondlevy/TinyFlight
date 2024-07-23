@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include <datatypes.h>
 
 #ifndef M_PI
@@ -14,16 +15,16 @@ class Utils {
         static constexpr float RAD2DEG = 180.0f / M_PI;
         static constexpr float GS2MSS = 9.81;
 
-        static void quat2euler(const quat_t & q, axis3_t & ang)
+        static void quat2euler(const quat_t & q, float & phi, float & theta, float & psi)
         {
             // We swap the X and Y axes and negate Y for nose-down positive.
-            ang.x = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
+            phi = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
 
-            ang.y = -RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
+            theta = -RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
                     (q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z));
 
             // Negate for nose-right positive
-            ang.z = -RAD2DEG * atan2((2 * (q.x*q.y + q.w*q.z)),
+            psi = -RAD2DEG * atan2((2 * (q.x*q.y + q.w*q.z)),
                     (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
         }
 

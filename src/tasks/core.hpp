@@ -1,19 +1,20 @@
+#pragma once
+
 #include <datatypes.h>
 #include <mixers.hpp>
 #include <utils.hpp>
 
-#include <closed_loop/altitude.hpp>
-#include <closed_loop/climb_rate.hpp>
-#include <closed_loop/pitch_roll_angle.hpp>
-#include <closed_loop/pitch_roll_rate.hpp>
-#include <closed_loop/position.hpp>
-#include <closed_loop/yaw_angle.hpp>
-#include <closed_loop/yaw_rate.hpp>
+#include <pids/altitude.hpp>
+#include <pids/climb_rate.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
+#include <pids/position.hpp>
+#include <pids/yaw_angle.hpp>
+#include <pids/yaw_rate.hpp>
 
 class CoreTask {
 
     public:
-
 
         void init(
                 const float pitch_roll_angle_kp, 
@@ -37,46 +38,50 @@ class CoreTask {
 
          void run(
                  const state_t & state, 
-                 const demands_t & openLoopDemands, 
+                 const demands_t & stickDemands, 
                  quad_motors_t & motors)
         {
             static flyingStatus_e _status;
 
-            switch (_status) {
+            static float _altitude_target;
 
-                // A simple state machine for flying status
-                case STATUS_TAKING_OFF:
-                    _status = state.pos.z > ZGROUND ?  STATUS_FLYING : _status;
-                    break;
+            _altitude_target =
+                _status == STATUS_FLYING ? 
+                _altitude_target + THROTTLE_SCALE * stickDemands.thrust :
+                _status == STATUS_LANDED ?
+                INITIAL_ALTITUDE_TARGET :
+                _altitude_target;
 
-                case STATUS_FLYING:
-                    _status = state.pos.z <= ZGROUND ? STATUS_LANDED : _status;
-                    _altitude_target += THROTTLE_SCALE * openLoopDemands.thrust;
-                    break;
+            _status = 
 
-                default: // LANDED
-                    _status = openLoopDemands.thrust > THROTTLE_ZERO ? 
-                        STATUS_TAKING_OFF : _status;
-                    _altitude_target = INITIAL_ALTITUDE_TARGET;
-                    break;
-            }
+                _status == STATUS_TAKING_OFF  && state.z > ZGROUND ?  
+                STATUS_FLYING :
+
+                _status == STATUS_FLYING && state.z <= ZGROUND ?  
+                STATUS_LANDED :
+
+                _status == STATUS_LANDED && 
+                stickDemands.thrust > THROTTLE_ZERO ? 
+                STATUS_TAKING_OFF :
+
+                _status;
 
             const auto landed = _status == STATUS_LANDED;
 
             demands_t demands = { 
-                openLoopDemands.thrust,
-                openLoopDemands.roll,
-                openLoopDemands.pitch,
-                openLoopDemands.yaw
+                stickDemands.thrust,
+                stickDemands.roll,
+                stickDemands.pitch,
+                stickDemands.yaw
             };
 
-            _positionController.run(state, _dt, demands);  // 
+            _positionController.run(state, _dt, demands);
 
             _pitchRollAngleController.run(
-                    _pitch_roll_angle_kp, state, _dt, demands); //
+                    _pitch_roll_angle_kp, state, _dt, demands);
 
             _pitchRollRateController.run(_pitch_roll_rate_kp,
-                    _pitch_roll_rate_kd, state, _dt, landed, demands); //
+                    _pitch_roll_rate_kd, state, _dt, landed, demands);
 
             _altitudeController.run(state, _dt, _altitude_target, demands);
 
@@ -121,8 +126,6 @@ class CoreTask {
          float _tscale; 
          float _tmin;
          float _dt;
-
-         float _altitude_target;
 
          PositionController _positionController;
          PitchRollAngleController _pitchRollAngleController;

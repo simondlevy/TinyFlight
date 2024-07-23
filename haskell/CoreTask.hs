@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module Crazyflie where
+module CoreTask where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -47,41 +47,40 @@ import YawRate
 -- Streams from C++ ----------------------------------------------------------
 
 demandsStruct :: Stream DemandsStruct
-demandsStruct = extern "stream_openLoopDemands" Nothing
+demandsStruct = extern "stream_stickDemands" Nothing
 
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
-inFlyingMode :: SBool
-inFlyingMode = extern "stream_inFlyingMode" Nothing
+altitudeTarget :: SFloat
+altitudeTarget = extern "stream_altitudeTarget" Nothing
 
-resetPids :: SBool
-resetPids = extern "stream_resetPids" Nothing
+landed :: SBool
+landed = extern "stream_landed" Nothing
 
-step = (motors, openLoopDemands) where
+step = (motors, stickDemands) where
 
-  vehicleState = liftState stateStruct
+  state = liftState stateStruct
 
-  openLoopDemands = liftDemands demandsStruct
+  stickDemands = liftDemands demandsStruct
 
   dt = rateToPeriod clock_rate
 
-  pids = [positionPid resetPids dt,
-          pitchRollAnglePid resetPids dt,
-          pitchRollRatePid resetPids dt,
-          altitudePid inFlyingMode dt,
-          climbRatePid inFlyingMode dt,
-          yawAnglePid dt,
-          yawRatePid dt]
+  pids = [positionController dt,
+          pitchRollAngleController dt,
+          pitchRollRateController landed dt,
+          altitudeController altitudeTarget dt,
+          climbRateController (not landed) dt,
+          yawAngleController dt,
+          yawRateController dt]
 
-  demands' = foldl (\demand pid -> pid vehicleState demand) openLoopDemands pids
+  demands' = foldl (
+     \demand pid -> pid state demand) stickDemands pids
 
-  thrust'' = if inFlyingMode then ((thrust demands') * tscale + tbase) else tmin
-
-  motors = quadXMixer $ Demands thrust''
-                                ((roll demands') * prscale)
-                                ((pitch demands') * prscale)
-                                ((yaw demands') * yscale)
+  motors = runCF $ Demands (thrust demands')
+                           (roll demands') 
+                           (pitch demands')
+                           (yaw demands')
 
 ------------------------------------------------------------------------------
  
@@ -89,11 +88,9 @@ spec = do
 
     let (motors, demands) = step
 
-    let (me_ne, m_se, m_sw, m_nw) = motors
+    let (m1, m2, m3, m4) = motors
 
-    trigger "setMotors" true [arg $ me_ne, arg $ m_se, arg $ m_sw, arg $ m_nw] 
-
-    trigger "debugDemands" true [arg $ roll demands, arg $ pitch demands]
+    trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
 
 -- Compile the spec
 main = reify spec >>= 
