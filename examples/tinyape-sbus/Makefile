@@ -1,4 +1,4 @@
-SKETCH = tinyape
+SKETCH = tinyape-sbus
 
 BOARD = teensy:avr:teensy40
 
