@@ -34,12 +34,12 @@ run nothrust reset kp kd dt target actual prev =
 
     error = target - actual
 
-    demand = if nothrust 
+    demand = if false -- nothrust 
              then 0 else 
              kp * error + kd * (error - prev) / dt
 
     prev' = if reset then 0 
-            else if nothrust then prev
+            else if false {--nothrust--} then prev
             else error
 
 {--

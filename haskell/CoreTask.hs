@@ -66,27 +66,23 @@ step = (motors, ydemand) where
 
   dt = rateToPeriod clock_rate
 
-  demands = positionController dt state stickDemands
-
-  ydemand = roll demands
-
-  demands' = pitchRollAngleController dt state demands
-
-  pids = [ -- positionController dt,
-          -- pitchRollAngleController dt,
+  pids = [positionController dt,
+          pitchRollAngleController dt,
           pitchRollRateController landed dt,
           altitudeController altitudeTarget dt,
           climbRateController (not landed) dt,
           yawAngleController dt,
           yawRateController dt]
 
-  demands'' = foldl (
-     \demand pid -> pid state demand) demands' pids
+  demands = foldl (
+     \demand pid -> pid state demand) stickDemands pids
 
-  motors = runCF $ Demands (thrust demands'')
-                           (roll demands'') 
-                           (pitch demands'')
-                           (yaw demands'')
+  ydemand = roll demands
+
+  motors = runCF $ Demands (thrust demands)
+                           (roll demands) 
+                           (pitch demands)
+                           (yaw demands)
 
 ------------------------------------------------------------------------------
  
