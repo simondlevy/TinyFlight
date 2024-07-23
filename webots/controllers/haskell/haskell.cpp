@@ -48,22 +48,12 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    while (_sim.isRunning()) {
-
-        // Get open-loop demands from input device (keyboard, joystick, etc.)
-        _sim.readSticks(
-                stream_stickDemands.thrust,
-                stream_stickDemands.roll, 
-                stream_stickDemands.pitch, 
-                stream_stickDemands.yaw);
-
-        // Get vehicle state from sensors
-        _sim.getVehicleState(stream_vehicleState);
+    while (_sim.step(stream_stickDemands, stream_vehicleState)) {
 
         copilot_step_core();
     }
 
-    _sim.close();
+    sim.close();
 
     return 0;
 }

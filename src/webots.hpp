@@ -25,6 +25,7 @@
 #include <map>
 #include <string>
 
+#include <datatypes.h>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -64,14 +65,17 @@ class Quadcopter {
             _motor4 = _makeMotor("motor4", -1);
         }
 
-        ~Quadcopter(void)
+        bool step(demands_t & stickDemands, state_t & vehicleState)
         {
-            close();
-        }
+            if (wb_robot_step((int)_timestep) == -1) {
+                return false;
+            }
 
-        bool isRunning(void)
-        {
-            return wb_robot_step((int)_timestep) != -1;
+            _readSticks(stickDemands.thrust, stickDemands.roll, stickDemands.pitch, stickDemands.yaw);
+
+            _getVehicleState(vehicleState);
+
+            return true;
         }
 
         void setMotors(
@@ -86,84 +90,9 @@ class Quadcopter {
             wb_motor_set_velocity(_motor4, -m4);
         }
 
-        void readSticks(
-                float & throttle, float & roll, float & pitch, float & yaw)
-        {
-            auto joystickStatus = haveJoystick();
-
-            throttle = 0;
-            roll = 0;
-            pitch = 0;
-            yaw = 0;
-
-            if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                readJoystick(throttle, roll, pitch, yaw);
-            }
-
-            else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                reportJoystick();
-            }
-
-            else {
-                readKeyboard(throttle, roll, pitch, yaw);
-            }
-        }
-
         void close(void)
         {
             wb_robot_cleanup();
-        }
-
-        void getVehicleState(state_t & state)
-        {
-            // Track previous time and position for calculating motion
-            static float tprev;
-            static float xprev;
-            static float yprev;
-            static float zprev;
-
-            const auto tcurr = wb_robot_get_time();
-            const auto dt =  tcurr - tprev;
-            tprev = tcurr;
-
-            auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
-
-            state.z = wb_gps_get_values(_gps)[2];
-
-            state.phi = Utils::RAD2DEG*(
-                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
-
-            state.dphi = Utils::RAD2DEG*(
-                    wb_gyro_get_values(_gyro)[0]);
-
-            state.theta = Utils::RAD2DEG*(
-                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
-
-            state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
-
-            state.psi  =  -Utils::RAD2DEG*(psi); 
-
-            state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
-
-            // Use temporal first difference to get world-cooredinate
-            // velocities
-            auto x = wb_gps_get_values(_gps)[0];
-            auto y = wb_gps_get_values(_gps)[1];
-            auto dx = (x - xprev) / dt;
-            auto dy = (y - yprev) / dt;
-            state.dz = (state.z - zprev) / dt;
-
-            // Rotate X,Y world velocities into body frame to simulate
-            // optical-flow sensor
-            auto cospsi = cos(psi);
-            auto sinpsi = sin(psi);
-            state.dx = dx * cospsi + dy * sinpsi;
-            state.dy = dx * sinpsi - dy * cospsi;
-
-            // Save past time and position for next time step
-            xprev = x;
-            yprev = y;
-            zprev = state.z;
         }
 
     private:
@@ -412,4 +341,80 @@ class Quadcopter {
             f(sensor, timestep);
             return sensor;
         }
+
+        void _readSticks(
+                float & throttle, float & roll, float & pitch, float & yaw)
+        {
+            auto joystickStatus = haveJoystick();
+
+            throttle = 0;
+            roll = 0;
+            pitch = 0;
+            yaw = 0;
+
+            if (joystickStatus == JOYSTICK_RECOGNIZED) {
+                readJoystick(throttle, roll, pitch, yaw);
+            }
+
+            else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+                reportJoystick();
+            }
+
+            else {
+                readKeyboard(throttle, roll, pitch, yaw);
+            }
+        }
+
+        void _getVehicleState(state_t & state)
+        {
+            // Track previous time and position for calculating motion
+            static float tprev;
+            static float xprev;
+            static float yprev;
+            static float zprev;
+
+            const auto tcurr = wb_robot_get_time();
+            const auto dt =  tcurr - tprev;
+            tprev = tcurr;
+
+            auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
+
+            state.z = wb_gps_get_values(_gps)[2];
+
+            state.phi = Utils::RAD2DEG*(
+                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
+
+            state.dphi = Utils::RAD2DEG*(
+                    wb_gyro_get_values(_gyro)[0]);
+
+            state.theta = Utils::RAD2DEG*(
+                    wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+
+            state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
+
+            state.psi  =  -Utils::RAD2DEG*(psi); 
+
+            state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
+
+            // Use temporal first difference to get world-cooredinate
+            // velocities
+            auto x = wb_gps_get_values(_gps)[0];
+            auto y = wb_gps_get_values(_gps)[1];
+            auto dx = (x - xprev) / dt;
+            auto dy = (y - yprev) / dt;
+            state.dz = (state.z - zprev) / dt;
+
+            // Rotate X,Y world velocities into body frame to simulate
+            // optical-flow sensor
+            auto cospsi = cos(psi);
+            auto sinpsi = sin(psi);
+            state.dx = dx * cospsi + dy * sinpsi;
+            state.dy = dx * sinpsi - dy * cospsi;
+
+            // Save past time and position for next time step
+            xprev = x;
+            yprev = y;
+            zprev = state.z;
+        }
+
 };

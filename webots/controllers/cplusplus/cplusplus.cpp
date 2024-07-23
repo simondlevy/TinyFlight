@@ -38,15 +38,7 @@ int main(int argc, char ** argv)
 
     demands_t demands = {};
 
-    while (sim.isRunning()) {
-
-        sim.readSticks(
-                demands.thrust,
-                demands.roll,
-                demands.pitch,
-                demands.yaw);
-
-        sim.getVehicleState(state);
+    while (sim.step(demands, state)) {
 
         quad_motors_t motors = {};
 
@@ -54,6 +46,8 @@ int main(int argc, char ** argv)
 
         sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
     }
+
+    sim.close();
 
     return 0;
 }
