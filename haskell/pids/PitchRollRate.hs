@@ -29,25 +29,20 @@ import Demands
 import State
 import Utils
 
-run nothrust reset kp kd dt target actual prev =
-  (demand, prev') where
+run reset kp kd dt target actual prev = (demand, prev') where
 
     error = target - actual
 
-    demand = if false -- nothrust 
-             then 0 else 
-             kp * error + kd * (error - prev) / dt
+    demand = kp * error + kd * (error - prev) / dt
 
-    prev' = if reset then 0 
-            else if false {--nothrust--} then prev
-            else error
+    prev' = if reset then 0 else error
 
 {--
   Demands are input as angular velocities in degrees per second and
   output in uints appropriate for our motors.
 --}
 
-pitchRollRateController reset dt state demands = demands' where
+pitchRollRateController dt state demands = demands' where
 
   kp = 1.25e-2
   kd = 1.25e-4
@@ -55,12 +50,12 @@ pitchRollRateController reset dt state demands = demands' where
   nothrust = (thrust demands) == 0
 
   (rollDemand, rollPrev) = 
-    run nothrust reset kp kd dt (roll demands) (dphi state) rollPrev'
+    run nothrust kp kd dt (roll demands) (dphi state) rollPrev'
 
   rollPrev' = [0] ++ rollPrev
 
   (pitchDemand, pitchPrev) = 
-    run nothrust reset kp kd dt (pitch demands) (dtheta state) pitchPrev'
+    run nothrust kp kd dt (pitch demands) (dtheta state) pitchPrev'
 
   pitchPrev' = [0] ++ pitchPrev
 
