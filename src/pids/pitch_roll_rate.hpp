@@ -18,7 +18,6 @@ class PitchRollRateController {
                 const float kd,
                 const state_t & state, 
                 const float dt, 
-                const bool reset,
                 demands_t & demands)
         {
             const auto nothrust = demands.thrust == 0;

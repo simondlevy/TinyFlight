@@ -81,7 +81,7 @@ class CoreTask {
                     _pitch_roll_angle_kp, state, _dt, demands);
 
             _pitchRollRateController.run(_pitch_roll_rate_kp,
-                    _pitch_roll_rate_kd, state, _dt, landed, demands);
+                    _pitch_roll_rate_kd, state, _dt, demands);
 
             _altitudeController.run(state, _dt, _altitude_target, demands);
 
