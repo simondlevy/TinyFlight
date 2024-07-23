@@ -44,6 +44,17 @@ import Position
 import YawAngle
 import YawRate
 
+-- Constants
+
+status_landed = 0 :: SInt8
+status_taking_off = 1 :: SInt8
+status_flying = 2 :: SInt8
+
+altitude_target_initial = 0.2 :: SFloat
+throttle_zero = 0.05 :: SFloat
+throttle_scale = 0.005 :: SFloat
+zground = 0.05 :: SFloat
+
 -- Streams from C++ ----------------------------------------------------------
 
 demandsStruct :: Stream DemandsStruct
@@ -64,12 +75,31 @@ step = motors where
 
   stickDemands = liftDemands demandsStruct
 
+  altitude_target = if status == status_flying 
+                    then altitude_target' + throttle_scale * (thrust stickDemands)
+                    else if status' == status_landed
+                    then altitude_target_initial
+                    else altitude_target'
+
+  altitude_target' = [0] ++ altitude_target
+
+  status = if status' == status_taking_off && (zz state) > zground
+           then status_flying
+           else if status' == status_flying && (zz state) <= zground
+           then status_landed
+           else if status' == status_landed && (thrust stickDemands) > throttle_zero
+           then status_taking_off
+           else status'
+
+  status' = [0] ++ status
+
   dt = rateToPeriod clock_rate
 
   pids = [positionController dt,
           pitchRollAngleController dt,
           pitchRollRateController dt,
-          altitudeController altitudeTarget dt,
+          -- altitudeController altitudeTarget dt,
+          altitudeController altitude_target dt,
           climbRateController (not landed) dt,
           yawAngleController dt,
           yawRateController dt]

@@ -22,10 +22,7 @@
 
 // ----------------------------------------------------------------------------
 
-// https://www.bitcraze.io/documentation/tutorials/getting-started-with-flow-deck/
 static const float ALTITUDE_TARGET_INITIAL = 0.2;
-static const float ALTITUDE_TARGET_MIN = 0.2;
-static const float ALTITUDE_TARGET_MAX = 2.0;
 
 static const float DT = .01;
 
