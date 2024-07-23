@@ -46,14 +46,14 @@ import YawRate
 
 -- Constants
 
-status_landed = 0 :: SInt8
+status_landed =     0 :: SInt8
 status_taking_off = 1 :: SInt8
-status_flying = 2 :: SInt8
+status_flying =     2 :: SInt8
 
 altitude_target_initial = 0.2 :: SFloat
-throttle_zero = 0.05 :: SFloat
-throttle_scale = 0.005 :: SFloat
-zground = 0.05 :: SFloat
+throttle_zero           = 0.05 :: SFloat
+throttle_scale          = 0.005 :: SFloat
+zground                 = 0.05 :: SFloat
 
 -- Streams from C++ ----------------------------------------------------------
 

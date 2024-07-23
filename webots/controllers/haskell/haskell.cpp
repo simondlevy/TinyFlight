@@ -17,7 +17,6 @@
  */
 
 #include <datatypes.h>
-#include <utils.hpp>
 #include <webots.hpp>
 
 // ----------------------------------------------------------------------------
@@ -25,7 +24,7 @@
 // Webots helper class
 static Quadcopter _sim;
 
-// These are global so they can be shared with Haskell Copilot ---------------
+// Global data and routines shared with Haskell Copilot ----------------------
 
 demands_t stream_stickDemands;
 
@@ -44,14 +43,6 @@ void setMotors(float m1, float m2, float m3, float m4)
 }
 
 // ---------------------------------------------------------------------------
-
-enum {
-
-    STATUS_LANDED,
-    STATUS_TAKING_OFF,
-    STATUS_FLYING
-
-};
 
 int main(int argc, char ** argv)
 {
